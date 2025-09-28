@@ -1,6 +1,7 @@
-import { createContext, useContext, ReactNode } from 'react'
+import { createContext, useContext } from 'react'
+import type { ReactNode } from 'react'
 import { useCards } from './useCards'
-import { Card } from './types'
+import type { Card } from './types'
 
 interface CardsContextType {
   cards: Card[]

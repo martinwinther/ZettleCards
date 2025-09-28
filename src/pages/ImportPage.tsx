@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { parseMdFile } from '../lib/extractFromMd'
 import { useCardsContext } from '../lib/CardsContext'
-import { Card } from '../lib/types'
+import type { Card } from '../lib/types'
 
 interface FilePreview {
   id: string

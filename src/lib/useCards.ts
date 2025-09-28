@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { Card } from './types'
+import type { Card } from './types'
 
 interface CardsState {
   cards: Card[]
