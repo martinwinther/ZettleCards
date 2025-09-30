@@ -8,6 +8,7 @@ interface CardsState {
   updateCard: (id: string, updates: Partial<Card>) => void
   removeCard: (id: string) => void
   clearCards: () => void
+  replaceAll: (newCards: Card[]) => void
 }
 
 /**
@@ -40,12 +41,17 @@ export function useCards(): CardsState {
     setCards([])
   }, [])
 
+  const replaceAll = useCallback((newCards: Card[]) => {
+    setCards(newCards)
+  }, [])
+
   return {
     cards,
     addCards,
     addCard,
     updateCard,
     removeCard,
-    clearCards
+    clearCards,
+    replaceAll
   }
 }

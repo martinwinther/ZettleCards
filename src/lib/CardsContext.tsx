@@ -10,6 +10,7 @@ interface CardsContextType {
   updateCard: (id: string, updates: Partial<Card>) => void
   removeCard: (id: string) => void
   clearCards: () => void
+  replaceAll: (newCards: Card[]) => void
 }
 
 const CardsContext = createContext<CardsContextType | undefined>(undefined)
