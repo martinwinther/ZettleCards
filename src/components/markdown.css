@@ -1,0 +1,215 @@
+/* Markdown content styling - global styles for rendered HTML */
+
+.markdown-content h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: rgb(17 24 39);
+}
+
+.dark .markdown-content h1 {
+  color: rgb(255 255 255);
+}
+
+.markdown-content h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: rgb(17 24 39);
+}
+
+.dark .markdown-content h2 {
+  color: rgb(255 255 255);
+}
+
+.markdown-content h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: rgb(17 24 39);
+}
+
+.dark .markdown-content h3 {
+  color: rgb(255 255 255);
+}
+
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: rgb(17 24 39);
+}
+
+.dark .markdown-content h4,
+.dark .markdown-content h5,
+.dark .markdown-content h6 {
+  color: rgb(255 255 255);
+}
+
+.markdown-content p {
+  margin-bottom: 1rem;
+}
+
+.markdown-content ul {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+  list-style-type: disc;
+}
+
+.markdown-content ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+  list-style-type: decimal;
+}
+
+.markdown-content li {
+  margin-bottom: 0.25rem;
+}
+
+.markdown-content ul ul,
+.markdown-content ol ol,
+.markdown-content ul ol,
+.markdown-content ol ul {
+  margin-bottom: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.markdown-content input[type="checkbox"] {
+  margin-right: 0.5rem;
+}
+
+.markdown-content blockquote {
+  border-left: 4px solid rgb(209 213 219);
+  padding-left: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  color: rgb(75 85 99);
+  font-style: italic;
+}
+
+.dark .markdown-content blockquote {
+  border-left-color: rgb(75 85 99);
+  color: rgb(156 163 175);
+}
+
+.markdown-content code {
+  background-color: rgb(243 244 246);
+  color: rgb(31 41 55);
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.dark .markdown-content code {
+  background-color: rgb(31 41 55);
+  color: rgb(229 231 235);
+}
+
+.markdown-content pre {
+  background-color: rgb(249 250 251);
+  border: 1px solid rgb(229 231 235);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  overflow-x: auto;
+}
+
+.dark .markdown-content pre {
+  background-color: rgb(17 24 39);
+  border-color: rgb(55 65 81);
+}
+
+.markdown-content pre code {
+  background-color: transparent;
+  padding: 0;
+  font-size: 0.875rem;
+}
+
+.markdown-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.markdown-content th {
+  border: 1px solid rgb(209 213 219);
+  padding: 0.5rem 0.75rem;
+  background-color: rgb(249 250 251);
+  font-weight: 600;
+  text-align: left;
+}
+
+.dark .markdown-content th {
+  border-color: rgb(75 85 99);
+  background-color: rgb(31 41 55);
+}
+
+.markdown-content td {
+  border: 1px solid rgb(209 213 219);
+  padding: 0.5rem 0.75rem;
+}
+
+.dark .markdown-content td {
+  border-color: rgb(75 85 99);
+}
+
+.markdown-content tbody tr:nth-child(even) {
+  background-color: rgb(249 250 251);
+}
+
+.dark .markdown-content tbody tr:nth-child(even) {
+  background-color: rgb(31 41 55);
+}
+
+.markdown-content a {
+  color: rgb(37 99 235);
+  text-decoration: underline;
+}
+
+.markdown-content a:hover {
+  color: rgb(29 78 216);
+}
+
+.dark .markdown-content a {
+  color: rgb(96 165 250);
+}
+
+.dark .markdown-content a:hover {
+  color: rgb(147 197 253);
+}
+
+.markdown-content hr {
+  border-color: rgb(209 213 219);
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.dark .markdown-content hr {
+  border-color: rgb(75 85 99);
+}
+
+.markdown-content strong {
+  font-weight: 600;
+}
+
+.markdown-content em {
+  font-style: italic;
+}
+
+.markdown-content del {
+  text-decoration: line-through;
+  color: rgb(107 114 128);
+}
+
+.dark .markdown-content del {
+  color: rgb(156 163 175);
+}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useCardsContext } from '../lib/CardsContext'
+import Markdown from '../components/Markdown'
 
 function CardView() {
   const { id } = useParams<{ id: string }>()
@@ -175,11 +176,7 @@ function CardView() {
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               Answer
             </h2>
-            <article className="prose prose-gray dark:prose-invert max-w-none">
-              <pre className="whitespace-pre-wrap font-sans text-sm text-gray-700 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-gray-900 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-{card.answerMD}
-              </pre>
-            </article>
+            <Markdown markdown={card.answerMD} />
           </div>
         </div>
       </div>
