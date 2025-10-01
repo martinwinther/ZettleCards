@@ -5,12 +5,12 @@ import type { Card } from './types'
 
 interface CardsContextType {
   cards: Card[]
-  addCards: (newCards: Card[]) => void
-  addCard: (card: Card) => void
-  updateCard: (id: string, updates: Partial<Card>) => void
-  removeCard: (id: string) => void
-  clearCards: () => void
-  replaceAll: (newCards: Card[]) => void
+  addCards: (newCards: Card[]) => Promise<void>
+  addCard: (card: Card) => Promise<void>
+  updateCard: (id: string, updates: Partial<Card>) => Promise<void>
+  removeCard: (id: string) => Promise<void>
+  clearCards: () => Promise<void>
+  replaceAll: (newCards: Card[]) => Promise<void>
 }
 
 const CardsContext = createContext<CardsContextType | undefined>(undefined)
