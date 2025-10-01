@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
+import InstallPrompt from '../components/InstallPrompt'
+import UpdateNotification from '../components/UpdateNotification'
 
 function AppLayout() {
   const [isDarkMode, setIsDarkMode] = useState(false)
@@ -26,6 +28,9 @@ function AppLayout() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors">
+      {/* Update Notification */}
+      <UpdateNotification />
+      
       {/* Skip to content link for accessibility */}
       <a 
         href="#main-content" 
@@ -91,14 +96,17 @@ function AppLayout() {
             </div>
           </nav>
           
-          {/* Dark Mode Toggle */}
-          <button
-            onClick={toggleDarkMode}
-            className="p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 shadow-sm hover:shadow-md"
-            aria-label="Toggle dark mode"
-          >
-            {isDarkMode ? '☀️' : '🌙'}
-          </button>
+          {/* Install Prompt & Dark Mode Toggle */}
+          <div className="flex items-center gap-3">
+            <InstallPrompt />
+            <button
+              onClick={toggleDarkMode}
+              className="p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 shadow-sm hover:shadow-md"
+              aria-label="Toggle dark mode"
+            >
+              {isDarkMode ? '☀️' : '🌙'}
+            </button>
+          </div>
         </div>
       </header>
 

@@ -10,6 +10,7 @@ Flash Files turns your Obsidian/Zettelkasten Markdown notes into simple, private
 - **Tags** = categories for browsing and study (from frontmatter and inline `#tags`)
 - **Review mode** with a lightweight Leitner system (Again / Good / Easy)
 - **Works offline** after first visit; your data is stored locally in your browser
+- **PWA installable** - install on your device for quick access and offline use
 
 ## How to use it
 
@@ -59,6 +60,14 @@ Everything after the title/frontmatter. If empty → `_(No content)_`.
 - Your notes **never leave your device**. Data is stored in IndexedDB.
 - The app can be **installed as a PWA** and used offline after the first load.
 - Rendered Markdown is **sanitized** to prevent scripts from running.
+- **PWA features**: Install prompt, update notifications, offline fallback
+
+## PWA Installation & Offline Use
+
+- **Install**: Click "Install app" button in the header or use browser's install option
+- **Offline**: After first load, works completely offline - review cards, import files, manage library
+- **Updates**: Automatic update notifications when new versions are available
+- **Standalone**: Runs like a native app when installed
 
 ## Known limitations
 
@@ -71,7 +80,12 @@ Everything after the title/frontmatter. If empty → `_(No content)_`.
 - **Review**: `Space` (flip), `1`/`2`/`3` (Again/Good/Easy)
 - **Library & forms**: standard browser shortcuts (`Tab`/`Shift+Tab`, `Enter`, `Esc`)
 
+## Technical Notes
+
+- **Development**: Runs on `http://localhost` - PWA features require HTTPS in production
+- **Data export**: Regular JSON backups recommended; CSV format compatible with Anki
+- **Browser support**: Modern browsers with IndexedDB and Service Worker support
+
 ---
 
 > **Note**: If something looks off (e.g., a title wasn't detected), you can edit tags and card titles in the Library after import.
-

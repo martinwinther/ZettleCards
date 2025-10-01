@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>You are offline - Flash Files</title>
+    <script src="https://cdn.tailwindcss.com/4.0.0"></script>
+  </head>
+  <body class="h-full bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+    <div class="min-h-full flex items-center justify-center px-4">
+      <div class="max-w-md w-full text-center">
+        <div class="text-6xl mb-6">📱</div>
+        <h1 class="text-2xl font-bold mb-4">You are offline</h1>
+        <p class="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+          Flash Files is available from your device cache. You can continue reviewing your flashcards and managing your notes even without an internet connection.
+        </p>
+        <p class="text-sm text-gray-500 dark:text-gray-500 mb-8">
+          Some features that require network access may be temporarily disabled.
+        </p>
+        <div class="space-y-4">
+          <button
+            onclick="window.history.back()"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-colors"
+          >
+            Go Back
+          </button>
+          <button
+            onclick="window.location.href = '/'"
+            class="w-full bg-gray-600 hover:bg-gray-700 text-white py-3 px-6 rounded-lg font-medium transition-colors"
+          >
+            Go to Library
+          </button>
+          <button
+            onclick="window.location.reload()"
+            class="w-full text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 py-2 transition-colors"
+          >
+            Try to reconnect
+          </button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

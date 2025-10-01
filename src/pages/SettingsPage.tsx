@@ -395,6 +395,48 @@ function SettingsPage() {
           </p>
         </section>
 
+        {/* PWA Section */}
+        <section className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            Offline Usage
+          </h2>
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-600 dark:text-green-400">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                  <polyline points="22,4 12,14.01 9,11.01" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  Offline mode enabled
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  The app caches your data and works without internet connection
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-blue-600 dark:text-blue-400">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7,10 12,15 17,10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  Installable app
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  Install Flash Files to your device for quick access
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Info Section */}
         <section className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
