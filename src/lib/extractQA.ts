@@ -1,4 +1,4 @@
-import matter from 'gray-matter'
+import { parseFrontMatter } from './parseFrontMatter'
 
 /**
  * Remove Zettelkasten UID prefix from filename
@@ -12,7 +12,7 @@ export function stripZkUid(name: string): string {
  * Extract question and answer from markdown content
  */
 export function extractQA(raw: string, filename: string): { question: string; answerMD: string } {
-  const parsed = matter(raw)
+  const parsed = parseFrontMatter(raw)
   const { data, content } = parsed
   
   let question = ''

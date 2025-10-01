@@ -1,4 +1,4 @@
-import matter from 'gray-matter'
+import { parseFrontMatter } from './parseFrontMatter'
 import { extractQA } from './extractQA'
 import { extractInlineTags, mergeAndNormalizeTags } from './tags'
 
@@ -12,7 +12,7 @@ export interface ParsedMdFile {
  * Parse a markdown file and extract question, answer, and tags
  */
 export function parseMdFile(raw: string, filename: string): ParsedMdFile {
-  const parsed = matter(raw)
+  const parsed = parseFrontMatter(raw)
   const { data } = parsed
   
   // Extract question and answer
