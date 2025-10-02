@@ -14,3 +14,4 @@ The three fundamental qualities of nature that bind the soul to the material wor
 
 Krishna teaches that transcending these three modes leads to liberation.
 
+

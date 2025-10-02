@@ -14,3 +14,4 @@ Unlike jnana (knowledge) or karma (action), bhakti requires no special qualifica
 
 #gita #bhakti #devotion #yoga
 
+

@@ -19,3 +19,4 @@ Both paths lead to liberation, but Krishna recommends karma yoga as more practic
 
 The key is not what you do, but the consciousness with which you do it.
 
+
