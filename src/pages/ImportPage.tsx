@@ -2,7 +2,17 @@ import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { parseMdFile } from '../lib/extractFromMd'
 import { useCardsContext } from '../lib/CardsContext'
+import { sha256 } from '../lib/hash'
+import { db } from '../db'
 import type { Card } from '../lib/types'
+
+type DuplicateAction = 'skip' | 'overwrite' | 'duplicate'
+
+interface DuplicateInfo {
+  existingCardId: string
+  existingQuestion: string
+  existingUpdatedAt: number
+}
 
 interface FilePreview {
   id: string
@@ -11,11 +21,14 @@ interface FilePreview {
   answerMD: string
   tags: string[]
   answerSnippet: string
+  contentHash: string
+  duplicateInfo: DuplicateInfo | null
+  action: DuplicateAction
 }
 
 function ImportPage() {
   const navigate = useNavigate()
-  const { addCards } = useCardsContext()
+  const { reload } = useCardsContext()
   const fileInputRef = useRef<HTMLInputElement>(null)
   
   const [previews, setPreviews] = useState<FilePreview[]>([])
@@ -47,13 +60,32 @@ function ImportPage() {
         const text = await file.text()
         const parsed = parseMdFile(text, file.name)
         
+        const contentHash = await sha256(parsed.question + '\n\n' + parsed.answerMD)
+        
+        const existingImport = await db.imports.where('contentHash').equals(contentHash).first()
+        let duplicateInfo: DuplicateInfo | null = null
+        
+        if (existingImport) {
+          const existingCard = await db.cards.get(existingImport.cardId)
+          if (existingCard) {
+            duplicateInfo = {
+              existingCardId: existingCard.id,
+              existingQuestion: existingCard.question,
+              existingUpdatedAt: existingCard.updatedAt
+            }
+          }
+        }
+        
         newPreviews.push({
           id: crypto.randomUUID(),
           filename: file.name,
           question: parsed.question,
           answerMD: parsed.answerMD,
           tags: parsed.tags,
-          answerSnippet: parsed.answerMD.slice(0, 120) + (parsed.answerMD.length > 120 ? '...' : '')
+          answerSnippet: parsed.answerMD.slice(0, 120) + (parsed.answerMD.length > 120 ? '...' : ''),
+          contentHash,
+          duplicateInfo,
+          action: duplicateInfo ? 'skip' : 'duplicate'
         })
       } catch (err) {
         console.error(`Error processing ${file.name}:`, err)
@@ -113,19 +145,61 @@ function ImportPage() {
     setError('')
   }
 
-  const importCards = () => {
-    const cards: Card[] = previews.map(preview => ({
-      id: crypto.randomUUID(),
-      question: preview.question,
-      answerMD: preview.answerMD,
-      tags: preview.tags,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      box: 1,
-      due: Date.now()
-    }))
+  const setPreviewAction = (previewId: string, action: DuplicateAction) => {
+    setPreviews(prev => prev.map(p => 
+      p.id === previewId ? { ...p, action } : p
+    ))
+  }
+
+  const setBulkAction = (action: DuplicateAction) => {
+    setPreviews(prev => prev.map(p => 
+      p.duplicateInfo ? { ...p, action } : p
+    ))
+  }
+
+  const importCards = async () => {
+    const now = Date.now()
     
-    addCards(cards)
+    for (const preview of previews) {
+      if (preview.action === 'skip') {
+        continue
+      }
+      
+      let cardId: string
+      
+      if (preview.action === 'overwrite' && preview.duplicateInfo) {
+        cardId = preview.duplicateInfo.existingCardId
+        await db.cards.update(cardId, {
+          question: preview.question,
+          answerMD: preview.answerMD,
+          tags: preview.tags,
+          updatedAt: now
+        })
+      } else {
+        cardId = crypto.randomUUID()
+        const newCard: Card = {
+          id: cardId,
+          question: preview.question,
+          answerMD: preview.answerMD,
+          tags: preview.tags,
+          createdAt: now,
+          updatedAt: now,
+          box: 1,
+          due: now
+        }
+        await db.cards.put(newCard)
+      }
+      
+      await db.imports.put({
+        id: crypto.randomUUID(),
+        fileName: preview.filename,
+        contentHash: preview.contentHash,
+        cardId,
+        createdAt: now
+      })
+    }
+    
+    await reload()
     navigate('/library')
   }
 
@@ -199,16 +273,51 @@ function ImportPage() {
                 onClick={importCards}
                 className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition-colors"
               >
-                Import {previews.length} cards
+                Import {previews.filter(p => p.action !== 'skip').length} cards
               </button>
             </div>
           </div>
+
+          {previews.some(p => p.duplicateInfo) && (
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-yellow-800 dark:text-yellow-200 font-medium">
+                    ⚠️ {previews.filter(p => p.duplicateInfo).length} duplicate(s) detected
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setBulkAction('skip')}
+                    className="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                  >
+                    Skip All
+                  </button>
+                  <button
+                    onClick={() => setBulkAction('overwrite')}
+                    className="px-3 py-1 text-sm bg-orange-200 dark:bg-orange-900/50 text-orange-800 dark:text-orange-200 rounded hover:bg-orange-300 dark:hover:bg-orange-900/70 transition-colors"
+                  >
+                    Overwrite All
+                  </button>
+                  <button
+                    onClick={() => setBulkAction('duplicate')}
+                    className="px-3 py-1 text-sm bg-blue-200 dark:bg-blue-900/50 text-blue-800 dark:text-blue-200 rounded hover:bg-blue-300 dark:hover:bg-blue-900/70 transition-colors"
+                  >
+                    Duplicate All
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50 dark:bg-gray-700">
                   <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                      Status
+                    </th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Filename
                     </th>
@@ -230,6 +339,7 @@ function ImportPage() {
                       preview={preview}
                       onAddTag={(tag) => addTag(preview.id, tag)}
                       onRemoveTag={(tag) => removeTag(preview.id, tag)}
+                      onSetAction={(action) => setPreviewAction(preview.id, action)}
                     />
                   ))}
                 </tbody>
@@ -246,9 +356,10 @@ interface PreviewRowProps {
   preview: FilePreview
   onAddTag: (tag: string) => void
   onRemoveTag: (tag: string) => void
+  onSetAction: (action: DuplicateAction) => void
 }
 
-function PreviewRow({ preview, onAddTag, onRemoveTag }: PreviewRowProps) {
+function PreviewRow({ preview, onAddTag, onRemoveTag, onSetAction }: PreviewRowProps) {
   const [newTag, setNewTag] = useState('')
 
   const handleAddTag = (e: React.FormEvent) => {
@@ -259,8 +370,43 @@ function PreviewRow({ preview, onAddTag, onRemoveTag }: PreviewRowProps) {
     }
   }
 
+  const formatDate = (timestamp: number) => {
+    return new Date(timestamp).toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric', 
+      year: 'numeric' 
+    })
+  }
+
   return (
     <tr className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+      <td className="px-4 py-4 text-sm">
+        {preview.duplicateInfo ? (
+          <div className="space-y-2">
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-medium text-yellow-700 dark:text-yellow-300">
+                Duplicate
+              </span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                Updated: {formatDate(preview.duplicateInfo.existingUpdatedAt)}
+              </span>
+            </div>
+            <select
+              value={preview.action}
+              onChange={(e) => onSetAction(e.target.value as DuplicateAction)}
+              className="w-full text-xs px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            >
+              <option value="skip">Skip</option>
+              <option value="overwrite">Overwrite</option>
+              <option value="duplicate">Create New</option>
+            </select>
+          </div>
+        ) : (
+          <span className="inline-flex items-center px-2 py-1 bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200 text-xs rounded-full font-medium">
+            New
+          </span>
+        )}
+      </td>
       <td className="px-4 py-4 text-sm text-gray-900 dark:text-white">
         <div className="font-medium">{preview.filename}</div>
       </td>

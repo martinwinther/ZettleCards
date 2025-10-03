@@ -1,23 +1,23 @@
 import Dexie from 'dexie'
+import type { Card } from '../lib/types'
 
-export interface Card {
+export interface ImportLog {
   id: string
-  question: string
-  answerMD: string
-  tags: string[]
+  fileName: string
+  contentHash: string
+  cardId: string
   createdAt: number
-  updatedAt: number
-  box: number
-  due: number
 }
 
 export class FlashDB extends Dexie {
   cards!: Dexie.Table<Card, string>
+  imports!: Dexie.Table<ImportLog, string>
 
   constructor() {
-    super('FlashDB')
+    super('FlashFilesDB')
     this.version(1).stores({
-      cards: 'id, question, box, due, updatedAt, *tags'
+      cards: 'id, createdAt, updatedAt, due, box, *tags',
+      imports: 'id, fileName, contentHash, cardId, createdAt'
     })
   }
 }

@@ -7,3 +7,4 @@ This is the ultimate reality—not just the unchanging Brahman, but the personal
 #gita #purushottama #metaphysics
 
 
+

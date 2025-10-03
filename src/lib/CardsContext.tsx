@@ -11,6 +11,7 @@ interface CardsContextType {
   removeCard: (id: string) => Promise<void>
   clearCards: () => Promise<void>
   replaceAll: (newCards: Card[]) => Promise<void>
+  reload: () => Promise<void>
 }
 
 const CardsContext = createContext<CardsContextType | undefined>(undefined)

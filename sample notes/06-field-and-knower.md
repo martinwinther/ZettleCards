@@ -12,3 +12,4 @@ Krishna makes a profound distinction between the field (kshetra) and the knower 
 Most people identify with the field, mistaking the body and mind for the true self. Liberation comes from realizing you are the knower, not the known—the eternal witness beyond all change.
 
 
+

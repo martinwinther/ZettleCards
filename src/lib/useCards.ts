@@ -10,6 +10,17 @@ interface CardsState {
   removeCard: (id: string) => Promise<void>
   clearCards: () => Promise<void>
   replaceAll: (newCards: Card[]) => Promise<void>
+  reload: () => Promise<void>
+}
+
+function normalizeCard(card: Card): Card {
+  const now = Date.now()
+  return {
+    ...card,
+    createdAt: card.createdAt || now,
+    updatedAt: card.updatedAt || now,
+    tags: Array.isArray(card.tags) ? card.tags : []
+  }
 }
 
 /**
@@ -18,60 +29,60 @@ interface CardsState {
 export function useCards(): CardsState {
   const [cards, setCards] = useState<Card[]>([])
 
-  // Load cards from Dexie on mount
-  useEffect(() => {
-    async function loadCards() {
-      const allCards = await db.cards.toArray()
-      setCards(allCards)
+  const reload = useCallback(async () => {
+    const allCards = await db.cards.orderBy('createdAt').reverse().toArray()
+    const normalized = allCards.map(normalizeCard)
+    
+    const needsUpdate = normalized.some((card, idx) => 
+      card.createdAt !== allCards[idx].createdAt || 
+      card.updatedAt !== allCards[idx].updatedAt
+    )
+    
+    if (needsUpdate) {
+      await db.cards.bulkPut(normalized)
     }
-    loadCards()
+    
+    setCards(normalized)
   }, [])
+
+  useEffect(() => {
+    reload()
+  }, [reload])
 
   const addCards = useCallback(async (newCards: Card[]) => {
-    // Use put to handle duplicates (upsert)
-    await db.cards.bulkPut(newCards)
-    setCards(prev => {
-      // Remove existing cards with same IDs, then add new ones
-      const existingIds = new Set(newCards.map(c => c.id))
-      const filtered = prev.filter(c => !existingIds.has(c.id))
-      return [...filtered, ...newCards]
-    })
-  }, [])
+    const normalized = newCards.map(normalizeCard)
+    await db.cards.bulkPut(normalized)
+    await reload()
+  }, [reload])
 
   const addCard = useCallback(async (card: Card) => {
-    await db.cards.put(card)
-    setCards(prev => {
-      // Remove if exists, then add
-      const filtered = prev.filter(c => c.id !== card.id)
-      return [...filtered, card]
-    })
-  }, [])
+    const normalized = normalizeCard(card)
+    await db.cards.put(normalized)
+    await reload()
+  }, [reload])
 
   const updateCard = useCallback(async (id: string, updates: Partial<Card>) => {
     const updatedData = { ...updates, updatedAt: Date.now() }
     await db.cards.update(id, updatedData)
-    setCards(prev => prev.map(card => 
-      card.id === id 
-        ? { ...card, ...updatedData }
-        : card
-    ))
-  }, [])
+    await reload()
+  }, [reload])
 
   const removeCard = useCallback(async (id: string) => {
     await db.cards.delete(id)
-    setCards(prev => prev.filter(card => card.id !== id))
-  }, [])
+    await reload()
+  }, [reload])
 
   const clearCards = useCallback(async () => {
     await db.cards.clear()
-    setCards([])
-  }, [])
+    await reload()
+  }, [reload])
 
   const replaceAll = useCallback(async (newCards: Card[]) => {
+    const normalized = newCards.map(normalizeCard)
     await db.cards.clear()
-    await db.cards.bulkPut(newCards)
-    setCards(newCards)
-  }, [])
+    await db.cards.bulkPut(normalized)
+    await reload()
+  }, [reload])
 
   return {
     cards,
@@ -80,6 +91,7 @@ export function useCards(): CardsState {
     updateCard,
     removeCard,
     clearCards,
-    replaceAll
+    replaceAll,
+    reload
   }
 }
