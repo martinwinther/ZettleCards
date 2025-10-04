@@ -8,6 +8,7 @@ interface CardsContextType {
   addCards: (newCards: Card[]) => Promise<void>
   addCard: (card: Card) => Promise<void>
   updateCard: (id: string, updates: Partial<Card>) => Promise<void>
+  bulkUpdateCards: (ids: string[], updates: Partial<Card>) => Promise<void>
   removeCard: (id: string) => Promise<void>
   clearCards: () => Promise<void>
   replaceAll: (newCards: Card[]) => Promise<void>

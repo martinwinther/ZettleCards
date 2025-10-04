@@ -1,8 +1,21 @@
 /**
+ * Normalize a single tag: trim, lowercase, remove leading #, collapse whitespace, keep hierarchies
+ */
+export function normalizeTag(tag: string): string {
+  return tag
+    .trim()
+    .toLowerCase()
+    .replace(/^#+/, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+/**
  * Normalize tags to lowercase and remove duplicates
  */
-export function normalizeTags(tags: string[]): string[] {
-  return [...new Set(tags.map(tag => tag.toLowerCase().trim()).filter(Boolean))]
+export function normalizeTags(tags: string[] | undefined): string[] {
+  if (!tags) return []
+  return [...new Set(tags.map(tag => normalizeTag(tag)).filter(Boolean))]
 }
 
 /**

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { parseMdFile } from '../lib/extractFromMd'
 import { useCardsContext } from '../lib/CardsContext'
 import { sha256 } from '../lib/hash'
+import { normalizeTag } from '../lib/tags'
 import { db } from '../db'
 import type { Card } from '../lib/types'
 
@@ -122,7 +123,7 @@ function ImportPage() {
   }
 
   const addTag = (previewId: string, tag: string) => {
-    const normalizedTag = tag.toLowerCase().trim().replace(/^#/, '')
+    const normalizedTag = normalizeTag(tag)
     if (!normalizedTag) return
     
     setPreviews(prev => prev.map(p => 

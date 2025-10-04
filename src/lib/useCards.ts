@@ -7,6 +7,7 @@ interface CardsState {
   addCards: (newCards: Card[]) => Promise<void>
   addCard: (card: Card) => Promise<void>
   updateCard: (id: string, updates: Partial<Card>) => Promise<void>
+  bulkUpdateCards: (ids: string[], updates: Partial<Card>) => Promise<void>
   removeCard: (id: string) => Promise<void>
   clearCards: () => Promise<void>
   replaceAll: (newCards: Card[]) => Promise<void>
@@ -67,6 +68,19 @@ export function useCards(): CardsState {
     await reload()
   }, [reload])
 
+  const bulkUpdateCards = useCallback(async (ids: string[], updates: Partial<Card>) => {
+    const now = Date.now()
+    const cardsToUpdate = await db.cards.bulkGet(ids)
+    const updatedCards = cardsToUpdate
+      .filter((card): card is Card => card !== undefined)
+      .map(card => ({ ...card, ...updates, updatedAt: now }))
+    
+    if (updatedCards.length > 0) {
+      await db.cards.bulkPut(updatedCards)
+      await reload()
+    }
+  }, [reload])
+
   const removeCard = useCallback(async (id: string) => {
     await db.cards.delete(id)
     await reload()
@@ -89,6 +103,7 @@ export function useCards(): CardsState {
     addCards,
     addCard,
     updateCard,
+    bulkUpdateCards,
     removeCard,
     clearCards,
     replaceAll,
