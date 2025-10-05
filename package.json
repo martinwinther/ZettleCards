@@ -7,7 +7,11 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:ui": "playwright test --ui",
+    "a11y-check": "playwright test tests/a11y --project=chromium"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.13",
@@ -24,6 +28,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
+    "@playwright/test": "^1.55.1",
     "@types/dompurify": "^3.0.5",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",

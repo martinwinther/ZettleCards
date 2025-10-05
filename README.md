@@ -69,10 +69,24 @@ Everything after the title/frontmatter. If empty → `_(No content)_`.
 - **Updates**: Automatic update notifications when new versions are available
 - **Standalone**: Runs like a native app when installed
 
+## Obsidian-Friendly Features
+
+- **Wiki-link rendering**: `[[Link]]` and `[[Target|Alias]]` syntax is supported
+  - Hover over wiki-links to see tooltip with linked card info
+  - Click to navigate to linked cards within your library
+  - Keyboard accessible (Tab + Enter)
+- **Bulk tag editing**: Select multiple cards in Library for batch operations
+  - Add/remove tags across multiple cards at once
+  - Export selected cards as JSON
+  - Undo support for bulk operations
+- **Smart import deduplication**: Content-based duplicate detection
+  - Skip, overwrite, or create new cards for duplicates
+  - Based on SHA-256 hash of question + answer content
+
 ## Known limitations
 
 - **Markdown only** (`.md`). No PDFs, images, or other formats.
-- Obsidian `[[wiki links]]` show as inert links (not resolved to other notes).
+- Wiki-links resolve to cards in your library; external notes aren't imported automatically.
 - Large files import, but extremely big notes may feel slow in preview.
 
 ## Keyboard shortcuts
@@ -86,6 +100,87 @@ Everything after the title/frontmatter. If empty → `_(No content)_`.
 - **Data export**: Regular JSON backups recommended; CSV format compatible with Anki
 - **Browser support**: Modern browsers with IndexedDB and Service Worker support
 
+## Polish & Testing
+
+### Error Handling
+
+The app includes comprehensive error boundaries:
+- **Error boundary**: Catches React errors and provides reload/report options
+- **Toast notifications**: Success/error feedback for imports, exports, and bulk operations
+- **Dev mode**: Shows detailed error stack traces in development
+
+To trigger error boundary (dev testing):
+```javascript
+// In browser console
+throw new Error('Test error boundary')
+```
+
+### Running Tests
+
+**Prerequisites**: Node.js 20+ and npm
+
+```bash
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# E2E tests (Playwright)
+npm run test:e2e           # Headless mode
+npm run test:e2e:headed    # With browser UI
+npm run test:e2e:ui        # Interactive UI mode
+
+# Accessibility smoke tests
+npm run a11y-check
+
+# Lint code
+npm run lint
+
+# Build for production
+npm run build
+```
+
+### Test Coverage
+
+- **E2E tests**: Import flow, review sessions, keyboard navigation
+- **A11y tests**: WCAG compliance, focus management, ARIA attributes
+- **Smoke tests**: Page loads, heading structure, interactive elements
+
+### CI/CD
+
+GitHub Actions workflow (`.github/workflows/ci.yml`):
+- Runs on push to `main`/`master` and pull requests
+- Executes linting, build, e2e tests, and a11y checks
+- Uploads Playwright test reports as artifacts
+
+### Accessibility Features
+
+- **Keyboard navigation**: Full keyboard support throughout the app
+- **Skip link**: Jump to main content (Tab from page load)
+- **Focus indicators**: Visible focus rings on all interactive elements
+- **ARIA labels**: Screen reader friendly labels and roles
+- **Dark mode**: System preference detection with manual toggle
+- **Contrast**: WCAG AA compliant color contrasts
+
+### Toast System
+
+Lightweight, no-dependency toast notifications:
+```typescript
+import { useToast } from './components/Toaster'
+
+const { toast } = useToast()
+
+toast({
+  type: 'success',  // 'success' | 'error' | 'info'
+  title: 'Operation complete',
+  message: 'Optional details here',
+  duration: 5000  // auto-dismiss ms (default: 5000)
+})
+```
+
+Toasts stack up to 4, auto-dismiss after 5 seconds, and support manual dismissal.
+
 ---
 
-> **Note**: If something looks off (e.g., a title wasn't detected), you can edit tags and card titles in the Library after import.
+> **Note**: If something looks off (e.g., a title wasn't detected), you can edit tags and card titles in the Library after import. Use bulk operations to efficiently manage large sets of cards.

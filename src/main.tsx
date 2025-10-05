@@ -4,11 +4,17 @@ import { RouterProvider } from 'react-router-dom'
 import './index.css'
 import { router } from './routes'
 import { CardsProvider } from './lib/CardsContext'
+import ErrorBoundary from './components/ErrorBoundary'
+import { ToastProvider } from './components/Toaster'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <CardsProvider>
-      <RouterProvider router={router} />
-    </CardsProvider>
+    <ErrorBoundary>
+      <ToastProvider>
+        <CardsProvider>
+          <RouterProvider router={router} />
+        </CardsProvider>
+      </ToastProvider>
+    </ErrorBoundary>
   </StrictMode>,
 )

@@ -34,7 +34,7 @@ function AppLayout() {
       {/* Skip to content link for accessibility */}
       <a 
         href="#main-content" 
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-lg z-50"
+        className="sr-only-focusable fixed top-4 left-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg z-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
       >
         Skip to content
       </a>
@@ -48,7 +48,7 @@ function AppLayout() {
               <NavLink 
                 to="/import"
                 className={({ isActive }) => 
-                  `px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                  `px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
                     isActive 
                       ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' 
                       : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-gray-700/50'
@@ -60,7 +60,7 @@ function AppLayout() {
               <NavLink 
                 to="/library"
                 className={({ isActive }) => 
-                  `px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                  `px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
                     isActive 
                       ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' 
                       : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-gray-700/50'
@@ -72,7 +72,7 @@ function AppLayout() {
               <NavLink 
                 to="/review"
                 className={({ isActive }) => 
-                  `px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                  `px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
                     isActive 
                       ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' 
                       : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-gray-700/50'
@@ -84,7 +84,7 @@ function AppLayout() {
               <NavLink 
                 to="/settings"
                 className={({ isActive }) => 
-                  `px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                  `px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
                     isActive 
                       ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm' 
                       : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-white/50 dark:hover:bg-gray-700/50'
@@ -101,8 +101,9 @@ function AppLayout() {
             <InstallPrompt />
             <button
               onClick={toggleDarkMode}
-              className="p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 shadow-sm hover:shadow-md"
-              aria-label="Toggle dark mode"
+              className="p-2.5 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+              aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              aria-pressed={isDarkMode}
             >
               {isDarkMode ? '☀️' : '🌙'}
             </button>

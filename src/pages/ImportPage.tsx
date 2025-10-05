@@ -4,6 +4,8 @@ import { parseMdFile } from '../lib/extractFromMd'
 import { useCardsContext } from '../lib/CardsContext'
 import { sha256 } from '../lib/hash'
 import { normalizeTag } from '../lib/tags'
+import { useToast } from '../components/Toaster'
+import { Spinner } from '../components/Spinner'
 import { db } from '../db'
 import type { Card } from '../lib/types'
 
@@ -30,11 +32,13 @@ interface FilePreview {
 function ImportPage() {
   const navigate = useNavigate()
   const { reload } = useCardsContext()
+  const { toast } = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
   
   const [previews, setPreviews] = useState<FilePreview[]>([])
   const [dragActive, setDragActive] = useState(false)
   const [error, setError] = useState<string>('')
+  const [isImporting, setIsImporting] = useState(false)
 
   useEffect(() => {
     document.title = 'Import - Flash Files'
@@ -160,48 +164,72 @@ function ImportPage() {
 
   const importCards = async () => {
     const now = Date.now()
+    const toImport = previews.filter(p => p.action !== 'skip')
     
-    for (const preview of previews) {
-      if (preview.action === 'skip') {
-        continue
-      }
-      
-      let cardId: string
-      
-      if (preview.action === 'overwrite' && preview.duplicateInfo) {
-        cardId = preview.duplicateInfo.existingCardId
-        await db.cards.update(cardId, {
-          question: preview.question,
-          answerMD: preview.answerMD,
-          tags: preview.tags,
-          updatedAt: now
-        })
-      } else {
-        cardId = crypto.randomUUID()
-        const newCard: Card = {
-          id: cardId,
-          question: preview.question,
-          answerMD: preview.answerMD,
-          tags: preview.tags,
-          createdAt: now,
-          updatedAt: now,
-          box: 1,
-          due: now
-        }
-        await db.cards.put(newCard)
-      }
-      
-      await db.imports.put({
-        id: crypto.randomUUID(),
-        fileName: preview.filename,
-        contentHash: preview.contentHash,
-        cardId,
-        createdAt: now
+    if (toImport.length === 0) {
+      toast({
+        type: 'info',
+        title: 'No cards to import',
+        message: 'All cards were skipped'
       })
+      return
     }
-    
-    await reload()
-    navigate('/library')
+
+    setIsImporting(true)
+
+    try {
+      for (const preview of toImport) {
+        let cardId: string
+        
+        if (preview.action === 'overwrite' && preview.duplicateInfo) {
+          cardId = preview.duplicateInfo.existingCardId
+          await db.cards.update(cardId, {
+            question: preview.question,
+            answerMD: preview.answerMD,
+            tags: preview.tags,
+            updatedAt: now
+          })
+        } else {
+          cardId = crypto.randomUUID()
+          const newCard: Card = {
+            id: cardId,
+            question: preview.question,
+            answerMD: preview.answerMD,
+            tags: preview.tags,
+            createdAt: now,
+            updatedAt: now,
+            box: 1,
+            due: now
+          }
+          await db.cards.put(newCard)
+        }
+        
+        await db.imports.put({
+          id: crypto.randomUUID(),
+          fileName: preview.filename,
+          contentHash: preview.contentHash,
+          cardId,
+          createdAt: now
+        })
+      }
+      
+      await reload()
+      toast({
+        type: 'success',
+        title: 'Import successful',
+        message: `Imported ${toImport.length} card(s)`
+      })
+      navigate('/library')
+    } catch (error) {
+      console.error('Import error:', error)
+      toast({
+        type: 'error',
+        title: 'Import failed',
+        message: error instanceof Error ? error.message : 'An error occurred'
+      })
+    } finally {
+      setIsImporting(false)
+    }
   }
 
   return (
@@ -272,9 +300,11 @@ function ImportPage() {
               </button>
               <button
                 onClick={importCards}
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition-colors"
+                disabled={isImporting}
+                className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
               >
-                Import {previews.filter(p => p.action !== 'skip').length} cards
+                {isImporting && <Spinner size="sm" />}
+                {isImporting ? 'Importing...' : `Import ${previews.filter(p => p.action !== 'skip').length} cards`}
               </button>
             </div>
           </div>
