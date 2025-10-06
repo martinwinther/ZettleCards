@@ -2,7 +2,6 @@ import { useEffect, useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useCardsContext } from '../lib/CardsContext'
 import { normalizeTag } from '../lib/tags'
-import { useToast } from '../components/Toaster'
 import TagSidebar from '../components/TagSidebar'
 import type { Card } from '../lib/types'
 
@@ -14,8 +13,7 @@ interface SnackbarState {
 }
 
 function LibraryPage() {
-  const { cards, updateCard, bulkUpdateCards, removeCard } = useCardsContext()
-  const { toast } = useToast()
+  const { cards, updateCard, removeCard } = useCardsContext()
   const [activeTags, setActiveTags] = useState<string[]>([])
   const [searchInput, setSearchInput] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')

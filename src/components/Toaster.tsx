@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react'
+import { createContext, useContext, useState, useCallback } from 'react'
+import type { ReactNode } from 'react'
 
 export type ToastType = 'success' | 'error' | 'info'
 
@@ -45,7 +46,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       return updated.slice(-4) // Keep max 4 toasts
     })
 
-    if (newToast.duration > 0) {
+    if (newToast.duration && newToast.duration > 0) {
       setTimeout(() => dismissToast(id), newToast.duration)
     }
   }, [dismissToast])

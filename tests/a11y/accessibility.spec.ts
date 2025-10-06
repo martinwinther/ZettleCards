@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import path from 'path'
 
 test.describe('Accessibility Smoke Tests', () => {
   test('all pages render without JS errors', async ({ page }) => {
@@ -120,11 +121,9 @@ test.describe('Accessibility Smoke Tests', () => {
     await page.goto('/import')
     
     // Trigger an import to show toast
-    const sampleFiles = ['sample notes/04-eternal-soul.md'].map(f => 
-      require('path').resolve(__dirname, '../../', f)
-    )
+    const samplePath = path.resolve(__dirname, '../../sample notes/04-eternal-soul.md')
     
-    await page.locator('input[type="file"]').setInputFiles(sampleFiles)
+    await page.locator('input[type="file"]').setInputFiles([samplePath])
     await page.waitForSelector('table tbody tr')
     await page.click('button:has-text("Import")')
     

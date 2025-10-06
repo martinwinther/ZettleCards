@@ -24,6 +24,7 @@ export default defineConfig({
         ]
       },
       workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
         navigateFallback: '/offline.html',
         navigateFallbackDenylist: [/^\/_/, /\/[^/?]+\.[^/]+$/],
         runtimeCaching: [
@@ -47,4 +48,17 @@ export default defineConfig({
       }
     })
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'markdown-vendor': ['marked', 'dompurify', 'highlight.js'],
+          'db-vendor': ['dexie']
+        }
+      }
+    },
+    chunkSizeWarningLimit: 600,
+    sourcemap: false
+  }
 })

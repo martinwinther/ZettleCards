@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test'
-import { readFile } from 'fs/promises'
 import path from 'path'
 
 test.describe('Import Flow', () => {

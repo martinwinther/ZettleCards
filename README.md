@@ -94,11 +94,52 @@ Everything after the title/frontmatter. If empty → `_(No content)_`.
 - **Review**: `Space` (flip), `1`/`2`/`3` (Again/Good/Easy)
 - **Library & forms**: standard browser shortcuts (`Tab`/`Shift+Tab`, `Enter`, `Esc`)
 
+## Production Deployment
+
+### Quick Deploy to Vercel (Recommended)
+
+1. Push this repo to GitHub/GitLab/Bitbucket
+2. Visit [vercel.com](https://vercel.com) and import your repo
+3. Vercel auto-detects settings from `vercel.json`
+4. Click "Deploy" - your app will be live in ~1 minute with HTTPS
+
+**Why Vercel?** HTTPS is required for PWA installation. Vercel provides it automatically.
+
+See [DEPLOY_CHECKLIST.md](DEPLOY_CHECKLIST.md) for detailed deployment instructions and other hosting options.
+
+### Local Production Build
+
+```bash
+npm run build      # Creates optimized build in dist/
+npm run preview    # Preview at http://localhost:4173
+```
+
+**Note**: Local preview uses HTTP. For true PWA testing (installation, offline), deploy to a host with HTTPS.
+
+### Production Checklist
+
+Before deploying:
+
+- ✅ Tailwind CSS v4 configured for production (unused styles purged)
+- ✅ PWA manifest with 192/512/maskable icons
+- ✅ Service Worker with `autoUpdate` registration
+- ✅ Code-split bundles (React, DB, Markdown vendors separated)
+- ✅ IndexedDB (Dexie) persists under production origin
+- ✅ All tests passing: `npm run test:e2e`
+
+Build output includes:
+- `dist/index.html` - App entry point
+- `dist/assets/` - Optimized JS/CSS bundles
+- `dist/manifest.webmanifest` - PWA manifest
+- `dist/sw.js` - Service Worker
+- `dist/*.png` - PWA icons
+
 ## Technical Notes
 
 - **Development**: Runs on `http://localhost` - PWA features require HTTPS in production
 - **Data export**: Regular JSON backups recommended; CSV format compatible with Anki
 - **Browser support**: Modern browsers with IndexedDB and Service Worker support
+- **Bundle sizes**: ~1.5MB total (gzipped ~450KB), split into vendor chunks for optimal caching
 
 ## Polish & Testing
 
