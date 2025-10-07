@@ -27,7 +27,7 @@ function ReviewPage() {
   const [sessionActive, setSessionActive] = useState(false)
 
   useEffect(() => {
-    document.title = 'Review - Flash Files'
+    document.title = 'Review - ZettleCards'
   }, [])
 
   // Helper function for Leitner scheduling

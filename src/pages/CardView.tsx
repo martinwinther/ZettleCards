@@ -14,9 +14,9 @@ function CardView() {
 
   useEffect(() => {
     if (card) {
-      document.title = `${card.question} - Flash Files`
+      document.title = `${card.question} - ZettleCards`
     } else {
-      document.title = 'Card Not Found - Flash Files'
+      document.title = 'Card Not Found - ZettleCards'
     }
   }, [card])
 

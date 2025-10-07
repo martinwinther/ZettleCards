@@ -88,7 +88,7 @@ function NoteSchemaPage() {
   const [isImporting, setIsImporting] = useState(false)
 
   useEffect(() => {
-    document.title = 'Note Schema - Flash Files'
+    document.title = 'Note Schema - ZettleCards'
   }, [])
 
   const handleParsePreview = () => {
@@ -298,7 +298,7 @@ function NoteSchemaPage() {
       {/* Introduction */}
       <section className="mb-12">
         <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-          Learn how Flash Files extracts questions, answers, and tags from your Obsidian or Zettelkasten Markdown notes. 
+          Learn how ZettleCards extracts questions, answers, and tags from your Obsidian or Zettelkasten Markdown notes. 
           Follow these conventions for reliable parsing and a smooth review experience.
         </p>
       </section>
@@ -310,7 +310,7 @@ function NoteSchemaPage() {
             Overview
           </h2>
           <p className="text-gray-700 dark:text-gray-300 mb-4">
-            Flash Files reads your Markdown notes and extracts:
+            ZettleCards reads your Markdown notes and extracts:
           </p>
           <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 mb-4">
             <li><strong>Question:</strong> Derived from frontmatter title, first H1, first line, or filename</li>
@@ -328,7 +328,7 @@ function NoteSchemaPage() {
             Title Extraction Rules
           </h2>
           <p className="text-gray-700 dark:text-gray-300 mb-4">
-            Flash Files uses this priority order to determine the question:
+            ZettleCards uses this priority order to determine the question:
           </p>
           <ol className="list-decimal list-inside space-y-3 text-gray-700 dark:text-gray-300 mb-6">
             <li><strong>Frontmatter <code className="text-sm bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded">title</code> field</strong> — highest priority</li>
@@ -421,7 +421,7 @@ The three gunas are sattva, rajas, and tamas.
             Tags (Categories)
           </h2>
           <p className="text-gray-700 dark:text-gray-300 mb-4">
-            Tags help organize your cards. Flash Files recognizes two tag sources:
+            Tags help organize your cards. ZettleCards recognizes two tag sources:
           </p>
           <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 mb-6">
             <li><strong>Frontmatter <code className="text-sm bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded">tags</code>:</strong> Can be an array <code className="text-sm bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded">[gita, karma]</code> or a string</li>
@@ -487,7 +487,7 @@ Arjuna faces a moral crisis on the battlefield of Kurukshetra.
             Zettelkasten UID Rules
           </h2>
           <p className="text-gray-700 dark:text-gray-300 mb-4">
-            If you use Zettelkasten-style unique identifiers in filenames, Flash Files automatically strips them when deriving the question from the filename.
+            If you use Zettelkasten-style unique identifiers in filenames, ZettleCards automatically strips them when deriving the question from the filename.
           </p>
           <p className="text-gray-700 dark:text-gray-300 mb-6">
             Recognized UID patterns (8-14 digits, optionally followed by <code className="text-sm bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded">-</code>, <code className="text-sm bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded">_</code>, or space):
@@ -668,7 +668,7 @@ print("Hello")  #inline-comment
             Test Your Note
           </h2>
           <p className="text-gray-700 dark:text-gray-300 mb-6">
-            Paste a note or upload a file to see how Flash Files will parse it. This uses the same extraction logic as the Import page.
+            Paste a note or upload a file to see how ZettleCards will parse it. This uses the same extraction logic as the Import page.
           </p>
 
           <div className="space-y-6">
@@ -813,7 +813,7 @@ print("Hello")  #inline-comment
                 🔁 Duplicate imports?
               </h3>
               <ul className="list-disc list-inside text-sm text-gray-700 dark:text-gray-300 space-y-1">
-                <li>Flash Files tracks imported notes by content hash</li>
+                <li>ZettleCards tracks imported notes by content hash</li>
                 <li>If you reimport the same content, the Import page will show duplicate warnings</li>
                 <li>You can choose to skip, overwrite, or create duplicates</li>
               </ul>
@@ -824,7 +824,7 @@ print("Hello")  #inline-comment
                 📝 Content not rendering correctly in review?
               </h3>
               <ul className="list-disc list-inside text-sm text-gray-700 dark:text-gray-300 space-y-1">
-                <li>Flash Files renders Markdown using CommonMark spec</li>
+                <li>ZettleCards renders Markdown using CommonMark spec</li>
                 <li>Check for unsupported syntax or extensions</li>
                 <li>Use the Card View (click a card in Library) to preview rendering</li>
               </ul>
@@ -841,7 +841,7 @@ print("Hello")  #inline-comment
             Found an edge case or have suggestions for better parsing? We'd love to hear from you!
           </p>
           <a
-            href="mailto:feedback@example.com?subject=Flash%20Files%20Note%20Parser%20Feedback&body=Please%20describe%20your%20issue%20or%20suggestion%20here."
+            href="mailto:contact@zettlecards.com?subject=ZettleCards%20Note%20Parser%20Feedback&body=Please%20describe%20your%20issue%20or%20suggestion%20here."
             className="inline-block bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
             Send Feedback

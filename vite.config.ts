@@ -10,13 +10,14 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Flash Files (Obsidian)',
-        short_name: 'FlashFiles',
-        description: 'Turn Obsidian/Zettelkasten notes into private flashcards.',
+        name: 'ZettleCards - Obsidian Flashcards',
+        short_name: 'ZettleCards',
+        description: 'Turn your Obsidian and Zettelkasten notes into private, offline-first flashcards with spaced repetition.',
         theme_color: '#0f172a',
         background_color: '#0f172a',
         display: 'standalone',
         start_url: '/',
+        categories: ['productivity', 'education'],
         icons: [
           { src: '/pwa-192.png', sizes: '192x192', type: 'image/png' },
           { src: '/pwa-512.png', sizes: '512x512', type: 'image/png' },

@@ -41,7 +41,7 @@ function ImportPage() {
   const [isImporting, setIsImporting] = useState(false)
 
   useEffect(() => {
-    document.title = 'Import - Flash Files'
+    document.title = 'Import - ZettleCards'
   }, [])
 
   const processFiles = async (files: FileList) => {

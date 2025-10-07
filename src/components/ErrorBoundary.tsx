@@ -37,7 +37,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   handleReport = (): void => {
     const { error, errorInfo } = this.state
     const appVersion = import.meta.env.VITE_APP_VERSION || 'unknown'
-    const subject = encodeURIComponent('Flash Files Error Report')
+    const subject = encodeURIComponent('ZettleCards Error Report')
     const body = encodeURIComponent(
       `Please describe what you were doing when the error occurred:\n\n` +
       `[Your description here]\n\n` +
@@ -49,7 +49,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       `Stack: ${error?.stack || 'No stack trace'}\n` +
       `Component Stack: ${errorInfo?.componentStack || 'No component stack'}\n`
     )
-    window.location.href = `mailto:support@example.com?subject=${subject}&body=${body}`
+    window.location.href = `mailto:contact@zettlecards.com?subject=${subject}&body=${body}`
   }
 
   render(): ReactNode {

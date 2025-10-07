@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 function NotFound() {
   useEffect(() => {
-    document.title = '404 - Page Not Found - Flash Files'
+    document.title = '404 - Page Not Found - ZettleCards'
   }, [])
 
   return (

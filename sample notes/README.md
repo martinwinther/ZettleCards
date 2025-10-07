@@ -1,6 +1,6 @@
 # Sample Notes - Format Examples
 
-All notes are based on the Bhagavad Gita. Each demonstrates a different format supported by Flash Files.
+All notes are based on the Bhagavad Gita. Each demonstrates a different format supported by ZettleCards.
 
 ## Files & Formats
 

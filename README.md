@@ -1,6 +1,6 @@
-# Flash Files (Obsidian) — User Guide
+# ZettleCards — User Guide
 
-Flash Files turns your Obsidian/Zettelkasten Markdown notes into simple, private flashcards you can review in your browser—no account, no cloud.
+ZettleCards turns your Obsidian/Zettelkasten Markdown notes into simple, private flashcards you can review in your browser—no account, no cloud.
 
 ## What it does
 

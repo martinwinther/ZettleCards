@@ -26,7 +26,7 @@ function SettingsPage() {
   const [isImporting, setIsImporting] = useState(false)
 
   useEffect(() => {
-    document.title = 'Settings - Flash Files'
+    document.title = 'Settings - ZettleCards'
   }, [])
 
   // CSV escape function for proper CSV formatting
@@ -49,7 +49,7 @@ function SettingsPage() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'flash-files-backup.json'
+    a.download = 'zettlecards-backup.json'
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
@@ -73,7 +73,7 @@ function SettingsPage() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'flash-files-export.csv'
+    a.download = 'zettlecards-export.csv'
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
@@ -430,7 +430,7 @@ function SettingsPage() {
                   Installable app
                 </p>
                 <p className="text-xs text-gray-600 dark:text-gray-400">
-                  Install Flash Files to your device for quick access
+                  Install ZettleCards to your device for quick access
                 </p>
               </div>
             </div>
@@ -443,7 +443,7 @@ function SettingsPage() {
             About Data Storage
           </h2>
           <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-            Flash Files stores all your data locally in your browser using IndexedDB. 
+            ZettleCards stores all your data locally in your browser using IndexedDB. 
             No data is sent to external servers. Regular exports are recommended for backup purposes.
             CSV exports can be imported into Anki or other spaced repetition software.
           </p>

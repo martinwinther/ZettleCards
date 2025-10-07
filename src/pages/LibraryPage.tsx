@@ -26,7 +26,7 @@ function LibraryPage() {
   const [snackbar, setSnackbar] = useState<SnackbarState | null>(null)
 
   useEffect(() => {
-    document.title = 'Library - Flash Files'
+    document.title = 'Library - ZettleCards'
   }, [])
 
   // Debounce search input
