@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { useCardsContext } from '../lib/CardsContext'
+import { useCardsContext } from '../lib/useCardsContext'
 import { BackupZ } from '../lib/schemas'
 import { normalizeTags } from '../lib/tags'
 import type { Backup } from '../lib/schemas'
@@ -105,7 +105,7 @@ function SettingsPage() {
       const validation = BackupZ.safeParse(parsed)
       
       if (!validation.success) {
-        const errors = validation.error.issues.map((err: any) => 
+        const errors = validation.error.issues.map((err) => 
           `${err.path.join('.')}: ${err.message}`
         ).slice(0, 10) // Limit to first 10 errors
         

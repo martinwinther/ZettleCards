@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { parseMdFile } from '../lib/extractFromMd'
-import { useCardsContext } from '../lib/CardsContext'
-import { useToast } from '../components/Toaster'
+import { useCardsContext } from '../lib/useCardsContext'
+import { useToast } from '../components/useToast'
 import { sha256 } from '../lib/hash'
 import { db } from '../db'
 import type { Card } from '../lib/types'
@@ -253,7 +253,7 @@ function NoteSchemaPage() {
         title: 'Copied to clipboard',
         message: label
       })
-    } catch (err) {
+    } catch {
       toast({
         type: 'error',
         title: 'Copy failed',

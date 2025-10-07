@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { useCardsContext } from '../lib/CardsContext'
+import { useCardsContext } from '../lib/useCardsContext'
 import Markdown from '../components/Markdown'
 
 function CardView() {

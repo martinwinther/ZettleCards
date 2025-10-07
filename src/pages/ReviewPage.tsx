@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { useCardsContext } from '../lib/CardsContext'
+import { useCardsContext } from '../lib/useCardsContext'
 import Markdown from '../components/Markdown'
 import type { Card } from '../lib/types'
 

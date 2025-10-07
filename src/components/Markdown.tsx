@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 import hljs from 'highlight.js'
-import { useCardsContext } from '../lib/CardsContext'
+import { useCardsContext } from '../lib/useCardsContext'
 import { extractWikiLinks, resolveWikiLink } from '../lib/wikiLinks'
 import type { WikiLinkResolution } from '../lib/wikiLinks'
 

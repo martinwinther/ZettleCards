@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { useCardsContext } from '../lib/CardsContext'
+import { useCardsContext } from '../lib/useCardsContext'
 import { normalizeTag } from '../lib/tags'
 import TagSidebar from '../components/TagSidebar'
 import type { Card } from '../lib/types'

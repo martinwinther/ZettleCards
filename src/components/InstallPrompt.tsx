@@ -17,7 +17,8 @@ function InstallPrompt() {
     // Check if already installed
     const checkInstalled = () => {
       // Check for standalone mode (iOS Safari, Android Chrome)
-      const isStandalone = (window.navigator as any).standalone || 
+      const nav = window.navigator as Navigator & { standalone?: boolean }
+      const isStandalone = nav.standalone || 
                           window.matchMedia('(display-mode: standalone)').matches ||
                           window.matchMedia('(display-mode: fullscreen)').matches
 
