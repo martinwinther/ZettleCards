@@ -448,6 +448,32 @@ function SettingsPage() {
             CSV exports can be imported into Anki or other spaced repetition software.
           </p>
         </section>
+
+        {/* Help & Documentation */}
+        <section className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            Help & Documentation
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">
+            Learn how to format your notes for optimal importing and review.
+          </p>
+          
+          <Link
+            to="/help/schema"
+            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="flex-shrink-0">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            <span>Note Schema Guide</span>
+          </Link>
+          
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
+            Includes examples, best practices, and a live note parser to test your Markdown files.
+          </p>
+        </section>
       </div>
     </div>
   )

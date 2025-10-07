@@ -5,6 +5,7 @@ import LibraryPage from './pages/LibraryPage'
 import CardView from './pages/CardView'
 import ReviewPage from './pages/ReviewPage'
 import SettingsPage from './pages/SettingsPage'
+import NoteSchemaPage from './pages/NoteSchemaPage'
 import NotFound from './pages/NotFound'
 
 export const router = createBrowserRouter([
@@ -35,6 +36,10 @@ export const router = createBrowserRouter([
       {
         path: 'settings',
         element: <SettingsPage />
+      },
+      {
+        path: 'help/schema',
+        element: <NoteSchemaPage />
       },
       {
         path: '*',

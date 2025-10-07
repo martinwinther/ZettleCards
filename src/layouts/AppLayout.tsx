@@ -118,8 +118,16 @@ function AppLayout() {
 
       {/* Footer */}
       <footer className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border-t border-gray-200/30 dark:border-gray-700/30 px-6 py-6">
-        <div className="max-w-7xl mx-auto text-center text-xs text-gray-500 dark:text-gray-500">
-          Transform your Obsidian notes into flashcards
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-center sm:text-left text-xs text-gray-500 dark:text-gray-500">
+            Transform your Obsidian notes into flashcards
+          </div>
+          <NavLink
+            to="/help/schema"
+            className="text-xs text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1"
+          >
+            📖 Note Schema Guide
+          </NavLink>
         </div>
       </footer>
     </div>
