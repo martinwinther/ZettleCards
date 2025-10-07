@@ -290,13 +290,18 @@ function ImportPage() {
           >
             Select Files
           </button>
+          <label htmlFor="file-upload" className="sr-only">
+            Upload markdown files
+          </label>
           <input
+            id="file-upload"
             ref={fileInputRef}
             type="file"
             multiple
             accept=".md"
             onChange={handleFileSelect}
             className="hidden"
+            aria-label="Upload markdown files"
           />
         </div>
       </div>
