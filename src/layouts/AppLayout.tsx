@@ -4,26 +4,30 @@ import InstallPrompt from '../components/InstallPrompt'
 import UpdateNotification from '../components/UpdateNotification'
 
 function AppLayout() {
-  const [isDarkMode, setIsDarkMode] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    // Initialize state from localStorage or system preference
+    const savedTheme = localStorage.getItem('theme')
+    if (savedTheme) {
+      return savedTheme === 'dark'
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches
+  })
 
   useEffect(() => {
-    // Set initial dark mode state based on system preference
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    setIsDarkMode(prefersDark)
-    if (prefersDark) {
+    // Apply dark mode class on mount and when state changes
+    if (isDarkMode) {
       document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
     }
-  }, [])
+  }, [isDarkMode])
 
   const toggleDarkMode = () => {
     const newDarkMode = !isDarkMode
     setIsDarkMode(newDarkMode)
     
-    if (newDarkMode) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
+    // Persist preference to localStorage
+    localStorage.setItem('theme', newDarkMode ? 'dark' : 'light')
   }
 
   return (
