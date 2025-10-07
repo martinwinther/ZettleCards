@@ -127,6 +127,7 @@ function NoteSchemaPage() {
   }
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const MAX_FILE_SIZE = 10 * 1024 // 10KB in bytes
     const file = e.target.files?.[0]
     if (!file) return
 
@@ -135,6 +136,15 @@ function NoteSchemaPage() {
         type: 'error',
         title: 'Invalid file type',
         message: 'Please upload a .md (Markdown) file'
+      })
+      return
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      toast({
+        type: 'error',
+        title: 'File too large',
+        message: `File size (${(file.size / 1024).toFixed(1)}KB) exceeds the 10KB limit`
       })
       return
     }

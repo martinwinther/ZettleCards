@@ -45,6 +45,7 @@ function ImportPage() {
   }, [])
 
   const processFiles = async (files: FileList) => {
+    const MAX_FILE_SIZE = 10 * 1024 // 10KB in bytes
     const mdFiles = Array.from(files).filter(file => file.name.endsWith('.md'))
     
     if (mdFiles.length === 0) {
@@ -52,7 +53,27 @@ function ImportPage() {
       return
     }
     
-    if (mdFiles.length !== files.length) {
+    // Check file sizes and filter out files that are too large
+    const validFiles: File[] = []
+    const oversizedFiles: string[] = []
+    
+    for (const file of mdFiles) {
+      if (file.size > MAX_FILE_SIZE) {
+        oversizedFiles.push(file.name)
+      } else {
+        validFiles.push(file)
+      }
+    }
+    
+    // Set error messages
+    if (validFiles.length === 0 && oversizedFiles.length > 0) {
+      setError(`All files exceed the 10KB size limit. Please use smaller notes.`)
+      return
+    }
+    
+    if (oversizedFiles.length > 0) {
+      setError(`${oversizedFiles.length} file(s) skipped (over 10KB): ${oversizedFiles.join(', ')}`)
+    } else if (mdFiles.length !== files.length) {
       setError('Some files were skipped - only .md files are supported.')
     } else {
       setError('')
@@ -60,7 +81,7 @@ function ImportPage() {
 
     const newPreviews: FilePreview[] = []
     
-    for (const file of mdFiles) {
+    for (const file of validFiles) {
       try {
         const text = await file.text()
         const parsed = parseMdFile(text, file.name)
@@ -258,6 +279,9 @@ function ImportPage() {
             </p>
             <p className="text-gray-600 dark:text-gray-400 mt-2">
               or click to browse files
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+              Maximum file size: 10KB per file
             </p>
           </div>
           <button
