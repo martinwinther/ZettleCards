@@ -229,7 +229,7 @@ function LibraryPage() {
 
   if (cards.length === 0) {
     return (
-      <div className="max-w-6xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-6 py-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
           Library
         </h1>
@@ -253,6 +253,19 @@ function LibraryPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          Library
+        </h1>
+        <Link
+          to="/import"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+        >
+          Import Files
+        </Link>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Sidebar */}
         <div className="lg:col-span-1">
@@ -266,18 +279,6 @@ function LibraryPage() {
 
         {/* Main content */}
         <div className="lg:col-span-3 space-y-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Library
-            </h1>
-            <Link
-              to="/import"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
-            >
-              Import Files
-            </Link>
-          </div>
 
           {/* Search and Sort */}
           <div className="flex flex-col sm:flex-row gap-4">
