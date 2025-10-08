@@ -646,27 +646,27 @@ print("Hello")  #inline-comment
           </h2>
           <ul className="space-y-3 text-green-800 dark:text-green-200">
             <li className="flex items-start">
-              <span className="mr-2">✓</span>
+              <span className="mr-2">•</span>
               <span><strong>One idea per note:</strong> Each note should capture a single concept or question</span>
             </li>
             <li className="flex items-start">
-              <span className="mr-2">✓</span>
+              <span className="mr-2">•</span>
               <span><strong>Use frontmatter <code className="text-sm bg-green-100 dark:bg-green-900 px-1 py-0.5 rounded">tags</code>:</strong> More reliable than inline tags for categorization</span>
             </li>
             <li className="flex items-start">
-              <span className="mr-2">✓</span>
+              <span className="mr-2">•</span>
               <span><strong>Hierarchical tags:</strong> Use <code className="text-sm bg-green-100 dark:bg-green-900 px-1 py-0.5 rounded">#subject/subtopic</code> to organize related notes</span>
             </li>
             <li className="flex items-start">
-              <span className="mr-2">✓</span>
+              <span className="mr-2">•</span>
               <span><strong>Clear questions:</strong> Use H1 headings or frontmatter titles that read as questions</span>
             </li>
             <li className="flex items-start">
-              <span className="mr-2">✓</span>
+              <span className="mr-2">•</span>
               <span><strong>Concise answers:</strong> Keep explanations focused and review-friendly</span>
             </li>
             <li className="flex items-start">
-              <span className="mr-2">✓</span>
+              <span className="mr-2">•</span>
               <span><strong>Test before batch import:</strong> Use the live parser below to verify parsing</span>
             </li>
           </ul>
@@ -797,7 +797,7 @@ print("Hello")  #inline-comment
           <div className="space-y-4">
             <div>
               <h3 className="font-medium text-gray-900 dark:text-white mb-2">
-                ❓ No title detected / Wrong title extracted?
+                No title detected / Wrong title extracted?
               </h3>
               <ul className="list-disc list-inside text-sm text-gray-700 dark:text-gray-300 space-y-1">
                 <li>Check if your frontmatter has a <code className="bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded">title:</code> field</li>
@@ -809,7 +809,7 @@ print("Hello")  #inline-comment
 
             <div>
               <h3 className="font-medium text-gray-900 dark:text-white mb-2">
-                🏷️ Tags missing or not detected?
+                Tags missing or not detected?
               </h3>
               <ul className="list-disc list-inside text-sm text-gray-700 dark:text-gray-300 space-y-1">
                 <li>Check if inline tags are inside code blocks (they're ignored there)</li>
@@ -820,7 +820,7 @@ print("Hello")  #inline-comment
 
             <div>
               <h3 className="font-medium text-gray-900 dark:text-white mb-2">
-                🔁 Duplicate imports?
+                Duplicate imports?
               </h3>
               <ul className="list-disc list-inside text-sm text-gray-700 dark:text-gray-300 space-y-1">
                 <li>ZettleCards tracks imported notes by content hash</li>
@@ -831,7 +831,7 @@ print("Hello")  #inline-comment
 
             <div>
               <h3 className="font-medium text-gray-900 dark:text-white mb-2">
-                📝 Content not rendering correctly in review?
+                Content not rendering correctly in review?
               </h3>
               <ul className="list-disc list-inside text-sm text-gray-700 dark:text-gray-300 space-y-1">
                 <li>ZettleCards renders Markdown using CommonMark spec</li>

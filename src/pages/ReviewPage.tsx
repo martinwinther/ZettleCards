@@ -205,7 +205,6 @@ function ReviewPage() {
           Review
         </h1>
         <div className="text-center py-12">
-          <div className="text-6xl mb-4">📚</div>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
             No cards to review
           </h2>
@@ -343,7 +342,6 @@ function ReviewPage() {
           {/* Session Complete Summary */}
           {stats.reviewed > 0 && (
             <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6 text-center">
-              <div className="text-2xl mb-2">🎉</div>
               <h3 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-2">
                 Session Complete!
               </h3>
@@ -388,7 +386,6 @@ function ReviewSession({ currentCard, showAnswer, onToggleAnswer, onRating, queu
   if (!currentCard) {
     return (
       <div className="text-center py-12">
-        <div className="text-4xl mb-4">🔍</div>
         <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
           Nothing to review
         </h3>

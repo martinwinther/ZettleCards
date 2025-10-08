@@ -383,7 +383,7 @@ function SettingsPage() {
         {/* Danger Zone */}
         <section className="bg-white dark:bg-gray-800 border-2 border-red-200 dark:border-red-800 rounded-lg p-6">
           <h2 className="text-xl font-semibold text-red-900 dark:text-red-100 mb-2">
-            ⚠️ Danger Zone
+            Danger Zone
           </h2>
           <p className="text-red-700 dark:text-red-300 text-sm mb-4">
             <strong>Replace All</strong> will permanently delete all existing cards and replace them with imported data. 

@@ -73,7 +73,7 @@ function InstallPrompt() {
   if (isInstalled || !installPromptEvent) {
     return showInstallSuccess ? (
       <div className="fixed top-20 right-4 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 text-green-800 dark:text-green-200 px-4 py-2 rounded-lg shadow-lg z-50 text-sm">
-        ✅ App installed — you can use it offline
+        App installed — you can use it offline
       </div>
     ) : null
   }

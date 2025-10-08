@@ -63,7 +63,6 @@ function CardView() {
     return (
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="text-center py-12">
-          <div className="text-6xl mb-4">🔍</div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             Card Not Found
           </h1>

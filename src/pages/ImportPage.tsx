@@ -272,7 +272,6 @@ function ImportPage() {
         onDrop={handleDrop}
       >
         <div className="space-y-4">
-          <div className="text-4xl">📄</div>
           <div>
             <p className="text-lg font-medium text-gray-900 dark:text-white">
               Drop your Obsidian .md files here
@@ -343,7 +342,7 @@ function ImportPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-yellow-800 dark:text-yellow-200 font-medium">
-                    ⚠️ {previews.filter(p => p.duplicateInfo).length} duplicate(s) detected
+                    {previews.filter(p => p.duplicateInfo).length} duplicate(s) detected
                   </span>
                 </div>
                 <div className="flex gap-2">
