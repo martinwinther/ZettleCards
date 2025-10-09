@@ -1,6 +1,6 @@
 # ZettleCards — User Guide
 
-ZettleCards turns your Obsidian/Zettelkasten Markdown notes into simple, private flashcards you can review in your browser—no account, no cloud.
+ZettleCards turns your Obsidian/Zettelkasten Markdown notes into simple, private flashcards you can review in your browser.
 
 ## What it does
 
@@ -96,17 +96,6 @@ Everything after the title/frontmatter. If empty → `_(No content)_`.
 
 ## Production Deployment
 
-### Quick Deploy to Vercel (Recommended)
-
-1. Push this repo to GitHub/GitLab/Bitbucket
-2. Visit [vercel.com](https://vercel.com) and import your repo
-3. Vercel auto-detects settings from `vercel.json`
-4. Click "Deploy" - your app will be live in ~1 minute with HTTPS
-
-**Why Vercel?** HTTPS is required for PWA installation. Vercel provides it automatically.
-
-See [DEPLOY_CHECKLIST.md](DEPLOY_CHECKLIST.md) for detailed deployment instructions and other hosting options.
-
 ### Local Production Build
 
 ```bash
@@ -116,23 +105,6 @@ npm run preview    # Preview at http://localhost:4173
 
 **Note**: Local preview uses HTTP. For true PWA testing (installation, offline), deploy to a host with HTTPS.
 
-### Production Checklist
-
-Before deploying:
-
-- ✅ Tailwind CSS v4 configured for production (unused styles purged)
-- ✅ PWA manifest with 192/512/maskable icons
-- ✅ Service Worker with `autoUpdate` registration
-- ✅ Code-split bundles (React, DB, Markdown vendors separated)
-- ✅ IndexedDB (Dexie) persists under production origin
-- ✅ All tests passing: `npm run test:e2e`
-
-Build output includes:
-- `dist/index.html` - App entry point
-- `dist/assets/` - Optimized JS/CSS bundles
-- `dist/manifest.webmanifest` - PWA manifest
-- `dist/sw.js` - Service Worker
-- `dist/*.png` - PWA icons
 
 ## Technical Notes
 
