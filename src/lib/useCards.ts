@@ -14,7 +14,11 @@ interface CardsState {
   reload: () => Promise<void>
 }
 
-function normalizeCard(card: Card): Card {
+/**
+ * Ensures card has required timestamp fields for database consistency
+ * Some older cards or imported cards may be missing these fields
+ */
+function ensureCardHasRequiredTimestamps(card: Card): Card {
   const now = Date.now()
   return {
     ...card,
@@ -32,7 +36,7 @@ export function useCards(): CardsState {
 
   const reload = useCallback(async () => {
     const allCards = await db.cards.orderBy('createdAt').reverse().toArray()
-    const normalized = allCards.map(normalizeCard)
+    const normalized = allCards.map(ensureCardHasRequiredTimestamps)
     
     const needsUpdate = normalized.some((card, idx) => 
       card.createdAt !== allCards[idx].createdAt || 
@@ -51,13 +55,13 @@ export function useCards(): CardsState {
   }, [reload])
 
   const addCards = useCallback(async (newCards: Card[]) => {
-    const normalized = newCards.map(normalizeCard)
+    const normalized = newCards.map(ensureCardHasRequiredTimestamps)
     await db.cards.bulkPut(normalized)
     await reload()
   }, [reload])
 
   const addCard = useCallback(async (card: Card) => {
-    const normalized = normalizeCard(card)
+    const normalized = ensureCardHasRequiredTimestamps(card)
     await db.cards.put(normalized)
     await reload()
   }, [reload])
@@ -92,7 +96,7 @@ export function useCards(): CardsState {
   }, [reload])
 
   const replaceAll = useCallback(async (newCards: Card[]) => {
-    const normalized = newCards.map(normalizeCard)
+    const normalized = newCards.map(ensureCardHasRequiredTimestamps)
     await db.cards.clear()
     await db.cards.bulkPut(normalized)
     await reload()

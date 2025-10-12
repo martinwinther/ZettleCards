@@ -2,7 +2,7 @@ import { parseFrontMatter } from './parseFrontMatter'
 import { extractQA } from './extractQA'
 import { extractInlineTags, mergeAndNormalizeTags } from './tags'
 
-export interface ParsedMdFile {
+export interface FlashcardData {
   question: string
   answerMD: string
   tags: string[]
@@ -11,7 +11,7 @@ export interface ParsedMdFile {
 /**
  * Parse a markdown file and extract question, answer, and tags
  */
-export function parseMdFile(raw: string, filename: string): ParsedMdFile {
+export function parseMarkdownFileToFlashcard(raw: string, filename: string): FlashcardData {
   const parsed = parseFrontMatter(raw)
   const { data } = parsed
   

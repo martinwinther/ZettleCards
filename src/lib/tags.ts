@@ -20,7 +20,7 @@ export function normalizeTags(tags: string[] | undefined): string[] {
 
 /**
  * Extract inline hashtags from markdown content
- * Excludes tags within code fences
+ * Excludes tags within code fences to avoid matching hashtags in code examples
  */
 export function extractInlineTags(markdown: string): string[] {
   // Remove fenced code blocks (``` or ~~~) before scanning for hashtags

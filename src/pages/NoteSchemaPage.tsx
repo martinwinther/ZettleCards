@@ -1,11 +1,13 @@
 import { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { parseMdFile } from '../lib/extractFromMd'
+import { parseMarkdownFileToFlashcard } from '../lib/extractFromMd'
 import { useCardsContext } from '../lib/useCardsContext'
 import { useToast } from '../components/useToast'
 import { sha256 } from '../lib/hash'
 import { db } from '../db'
 import type { Card } from '../lib/types'
+
+const MAX_FILE_SIZE_BYTES = 10 * 1024
 
 interface ParsedResult {
   question: string
@@ -102,7 +104,7 @@ function NoteSchemaPage() {
     }
 
     try {
-      const parsed = parseMdFile(testNote, testFilename)
+      const parsed = parseMarkdownFileToFlashcard(testNote, testFilename)
       const snippet = parsed.answerMD.slice(0, 150) + (parsed.answerMD.length > 150 ? '...' : '')
       
       setParsedResult({
@@ -127,7 +129,6 @@ function NoteSchemaPage() {
   }
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const MAX_FILE_SIZE = 10 * 1024 // 10KB in bytes
     const file = e.target.files?.[0]
     if (!file) return
 
@@ -140,7 +141,7 @@ function NoteSchemaPage() {
       return
     }
 
-    if (file.size > MAX_FILE_SIZE) {
+    if (file.size > MAX_FILE_SIZE_BYTES) {
       toast({
         type: 'error',
         title: 'File too large',
@@ -155,7 +156,7 @@ function NoteSchemaPage() {
       setTestFilename(file.name)
       
       // Auto-parse
-      const parsed = parseMdFile(content, file.name)
+      const parsed = parseMarkdownFileToFlashcard(content, file.name)
       const snippet = parsed.answerMD.slice(0, 150) + (parsed.answerMD.length > 150 ? '...' : '')
       
       setParsedResult({

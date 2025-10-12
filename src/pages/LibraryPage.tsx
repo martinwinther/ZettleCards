@@ -14,7 +14,7 @@ interface SnackbarState {
 
 function LibraryPage() {
   const { cards, updateCard, removeCard } = useCardsContext()
-  const [activeTags, setActiveTags] = useState<string[]>([])
+  const [selectedFilterTags, setSelectedFilterTags] = useState<string[]>([])
   const [searchInput, setSearchInput] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [sortBy, setSortBy] = useState<SortOption>('newest')
@@ -23,7 +23,7 @@ function LibraryPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [bulkTagInput, setBulkTagInput] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
-  const [snackbar, setSnackbar] = useState<SnackbarState | null>(null)
+  const [undoNotification, setUndoNotification] = useState<SnackbarState | null>(null)
 
   useEffect(() => {
     document.title = 'Library - ZettleCards'
@@ -41,11 +41,11 @@ function LibraryPage() {
   const filteredCards = useMemo(() => {
     let filtered = cards
 
-    // Filter by active tags (AND logic)
-    if (activeTags.length > 0) {
+    // Filter by selected tags using AND logic (card must have ALL selected tags)
+    if (selectedFilterTags.length > 0) {
       filtered = filtered.filter(card =>
-        activeTags.every(activeTag => 
-          card.tags.some(cardTag => cardTag.toLowerCase() === activeTag.toLowerCase())
+        selectedFilterTags.every(selectedTag => 
+          card.tags.some(cardTag => cardTag.toLowerCase() === selectedTag.toLowerCase())
         )
       )
     }
@@ -76,10 +76,10 @@ function LibraryPage() {
     })
 
     return sorted
-  }, [cards, activeTags, debouncedSearch, sortBy])
+  }, [cards, selectedFilterTags, debouncedSearch, sortBy])
 
   const handleToggleTag = (tag: string) => {
-    setActiveTags(prev =>
+    setSelectedFilterTags(prev =>
       prev.includes(tag)
         ? prev.filter(t => t !== tag)
         : [...prev, tag]
@@ -87,7 +87,7 @@ function LibraryPage() {
   }
 
   const handleClearFilters = () => {
-    setActiveTags([])
+    setSelectedFilterTags([])
     setSearchInput('')
   }
 
@@ -133,8 +133,26 @@ function LibraryPage() {
     setSelectedIds(newSelected)
   }
 
-  const hideSnackbar = () => {
-    setSnackbar(null)
+  const hideUndoNotification = () => {
+    setUndoNotification(null)
+  }
+
+  const createTagOperationSnapshot = (selectedCards: Card[]): Map<string, string[]> => {
+    return new Map(selectedCards.map(card => [card.id, [...card.tags]]))
+  }
+
+  const applyTagToCards = async (selectedCards: Card[], tagToAdd: string) => {
+    for (const card of selectedCards) {
+      const newTags = Array.from(new Set([...card.tags, tagToAdd]))
+      await updateCard(card.id, { tags: newTags })
+    }
+  }
+
+  const removeTagFromCards = async (selectedCards: Card[], tagToRemove: string) => {
+    for (const card of selectedCards) {
+      const newTags = card.tags.filter(t => t !== tagToRemove)
+      await updateCard(card.id, { tags: newTags })
+    }
   }
 
   const handleBulkAddTag = async () => {
@@ -145,28 +163,23 @@ function LibraryPage() {
     
     setIsProcessing(true)
 
-    const previousTags = new Map(
-      selectedCards.map(card => [card.id, [...card.tags]])
-    )
+    const previousTags = createTagOperationSnapshot(selectedCards)
 
     try {
-      for (const card of selectedCards) {
-        const newTags = Array.from(new Set([...card.tags, tag]))
-        await updateCard(card.id, { tags: newTags })
-      }
+      await applyTagToCards(selectedCards, tag)
 
       setBulkTagInput('')
-      setSnackbar({
+      setUndoNotification({
         message: `Added tag #${tag} to ${selectedIds.size} card(s)`,
         onUndo: async () => {
           for (const [id, tags] of previousTags) {
             await updateCard(id, { tags })
           }
-          hideSnackbar()
+          hideUndoNotification()
         }
       })
 
-      setTimeout(hideSnackbar, 6000)
+      setTimeout(hideUndoNotification, 6000)
     } finally {
       setIsProcessing(false)
     }
@@ -178,27 +191,22 @@ function LibraryPage() {
     const selectedCards = cards.filter(c => selectedIds.has(c.id))
     setIsProcessing(true)
 
-    const previousTags = new Map(
-      selectedCards.map(card => [card.id, [...card.tags]])
-    )
+    const previousTags = createTagOperationSnapshot(selectedCards)
 
     try {
-      for (const card of selectedCards) {
-        const newTags = card.tags.filter(t => t !== tagToRemove)
-        await updateCard(card.id, { tags: newTags })
-      }
+      await removeTagFromCards(selectedCards, tagToRemove)
 
-      setSnackbar({
+      setUndoNotification({
         message: `Removed tag #${tagToRemove} from ${selectedIds.size} card(s)`,
         onUndo: async () => {
           for (const [id, tags] of previousTags) {
             await updateCard(id, { tags })
           }
-          hideSnackbar()
+          hideUndoNotification()
         }
       })
 
-      setTimeout(hideSnackbar, 6000)
+      setTimeout(hideUndoNotification, 6000)
     } finally {
       setIsProcessing(false)
     }
@@ -271,7 +279,7 @@ function LibraryPage() {
         <div className="lg:col-span-1">
           <TagSidebar
             cards={cards}
-            activeTags={activeTags}
+            activeTags={selectedFilterTags}
             onToggleTag={handleToggleTag}
             onClearFilters={handleClearFilters}
           />
@@ -316,9 +324,9 @@ function LibraryPage() {
           {/* Results count */}
           <div className="text-sm text-gray-600 dark:text-gray-400">
             {filteredCards.length} result{filteredCards.length !== 1 ? 's' : ''}
-            {activeTags.length > 0 && (
+            {selectedFilterTags.length > 0 && (
               <span className="ml-2">
-                · Filtered by: {activeTags.map(tag => `#${tag}`).join(', ')}
+                · Filtered by: {selectedFilterTags.map(tag => `#${tag}`).join(', ')}
               </span>
             )}
           </div>
@@ -551,18 +559,18 @@ function LibraryPage() {
         </div>
       </div>
 
-      {/* Undo snackbar */}
-      {snackbar && (
+      {/* Undo notification */}
+      {undoNotification && (
         <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-6 py-3 rounded-lg shadow-lg flex items-center gap-4">
-          <span className="text-sm">{snackbar.message}</span>
+          <span className="text-sm">{undoNotification.message}</span>
           <button
-            onClick={snackbar.onUndo}
+            onClick={undoNotification.onUndo}
             className="text-sm font-medium underline hover:no-underline"
           >
             Undo
           </button>
           <button
-            onClick={hideSnackbar}
+            onClick={hideUndoNotification}
             className="text-sm opacity-75 hover:opacity-100"
           >
             ×

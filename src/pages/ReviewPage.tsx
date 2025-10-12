@@ -4,6 +4,11 @@ import { useCardsContext } from '../lib/useCardsContext'
 import Markdown from '../components/Markdown'
 import type { Card } from '../lib/types'
 
+// Spaced repetition intervals using Leitner system
+const LEITNER_BOX_INTERVALS_IN_DAYS = { 1: 1, 2: 1, 3: 3, 4: 7, 5: 21 } as const
+const MIN_LEITNER_BOX = 1
+const MAX_LEITNER_BOX = 5
+
 type Rating = "again" | "good" | "easy"
 
 interface SessionStats {
@@ -30,14 +35,24 @@ function ReviewPage() {
     document.title = 'Review - ZettleCards'
   }, [])
 
-  // Helper function for Leitner scheduling
-  const nextBoxAndDue = useCallback((prevBox: number | undefined, rating: Rating, now: number): { box: 1|2|3|4|5, due: number } => {
-    const box = Math.max(1, Math.min(5, prevBox ?? 1))
-    if (rating === "again") return { box: 1, due: now }
-    const next = Math.max(1, Math.min(5, box + (rating === "easy" ? 2 : 1)))
-    const days = { 1: 1, 2: 1, 3: 3, 4: 7, 5: 21 } as const
-    const intervalDays = days[next as keyof typeof days]
-    return { box: next as 1|2|3|4|5, due: now + intervalDays * 24 * 60 * 60 * 1000 }
+  /**
+   * Calculate next review schedule using Leitner spaced repetition system
+   * "again" resets to box 1, "good" advances by 1 box, "easy" advances by 2 boxes
+   * Each box has progressively longer intervals: 1, 1, 3, 7, 21 days
+   */
+  const calculateNextReviewSchedule = useCallback((prevBox: number | undefined, rating: Rating, now: number): { box: 1|2|3|4|5, due: number } => {
+    const currentBox = Math.max(MIN_LEITNER_BOX, Math.min(MAX_LEITNER_BOX, prevBox ?? MIN_LEITNER_BOX))
+    
+    if (rating === "again") {
+      return { box: MIN_LEITNER_BOX, due: now }
+    }
+    
+    const boxIncrement = rating === "easy" ? 2 : 1
+    const nextBox = Math.max(MIN_LEITNER_BOX, Math.min(MAX_LEITNER_BOX, currentBox + boxIncrement))
+    const intervalDays = LEITNER_BOX_INTERVALS_IN_DAYS[nextBox as keyof typeof LEITNER_BOX_INTERVALS_IN_DAYS]
+    const dueTimestamp = now + intervalDays * 24 * 60 * 60 * 1000
+    
+    return { box: nextBox as 1|2|3|4|5, due: dueTimestamp }
   }, [])
 
   // Compute tag counts from all cards
@@ -53,8 +68,7 @@ function ReviewPage() {
       .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag))
   }, [cards])
 
-  // Statistics for HUD
-  const hudStats = useMemo(() => {
+  const sessionStatistics = useMemo(() => {
     const endOfToday = new Date()
     endOfToday.setHours(23, 59, 59, 999)
     
@@ -69,26 +83,23 @@ function ReviewPage() {
     }
   }, [cards, queue.length, stats.reviewed])
 
-  // Build review queue
-  const buildQueue = useCallback(() => {
+  const filterCardsBySelectedTags = useCallback((allCards: Card[], tagsToMatch: string[]): Card[] => {
+    if (tagsToMatch.length === 0) return allCards
     
-    // Filter cards by selected tags (must have ALL selected tags)
-    let pool = cards
-    if (selectedTags.length > 0) {
-      pool = cards.filter(card =>
-        selectedTags.every(selectedTag =>
-          card.tags.some(cardTag => cardTag.toLowerCase() === selectedTag.toLowerCase())
-        )
+    // AND logic: card must have ALL selected tags
+    return allCards.filter(card =>
+      tagsToMatch.every(selectedTag =>
+        card.tags.some(cardTag => cardTag.toLowerCase() === selectedTag.toLowerCase())
       )
-    }
+    )
+  }, [])
 
-    // Get due cards (sorted by box asc, due asc, updatedAt desc)
-    const now = Date.now()
-    const due = pool
-      .filter(card => (card.due ?? 0) <= now && card.box != null)
+  const getDueCardsForReview = useCallback((eligibleCards: Card[], currentTime: number): Card[] => {
+    return eligibleCards
+      .filter(card => (card.due ?? 0) <= currentTime && card.box != null)
       .sort((a, b) => {
-        const boxA = a.box ?? 1
-        const boxB = b.box ?? 1
+        const boxA = a.box ?? MIN_LEITNER_BOX
+        const boxB = b.box ?? MIN_LEITNER_BOX
         if (boxA !== boxB) return boxA - boxB
         
         const dueA = a.due ?? 0
@@ -97,20 +108,29 @@ function ReviewPage() {
         
         return b.updatedAt - a.updatedAt
       })
+  }, [])
 
-    // Get new cards if enabled
-    const fresh = includeNew 
-      ? pool.filter(card => card.due == null || card.box == null).slice(0, newPerSession)
-      : []
+  const getNewCardsForSession = useCallback((eligibleCards: Card[], maxCount: number): Card[] => {
+    return eligibleCards
+      .filter(card => card.due == null || card.box == null)
+      .slice(0, maxCount)
+  }, [])
 
-    const ids = [...due.map(card => card.id), ...fresh.map(card => card.id)]
+  const buildQueue = useCallback(() => {
+    const eligibleCards = filterCardsBySelectedTags(cards, selectedTags)
+    const now = Date.now()
+    
+    const dueCards = getDueCardsForReview(eligibleCards, now)
+    const newCards = includeNew ? getNewCardsForSession(eligibleCards, newPerSession) : []
+    
+    const ids = [...dueCards.map(card => card.id), ...newCards.map(card => card.id)]
     
     setQueue(ids)
     setCurrentId(ids[0] ?? null)
     setShowAnswer(false)
     setStats({ reviewed: 0, again: 0, good: 0, easy: 0 })
     setSessionActive(true)
-  }, [cards, selectedTags, includeNew, newPerSession])
+  }, [cards, selectedTags, includeNew, newPerSession, filterCardsBySelectedTags, getDueCardsForReview, getNewCardsForSession])
 
   // Get current card
   const currentCard = useMemo(() => {
@@ -122,7 +142,7 @@ function ReviewPage() {
     if (!currentCard || !showAnswer) return
 
     const now = Date.now()
-    const { box, due } = nextBoxAndDue(currentCard.box, rating, now)
+    const { box, due } = calculateNextReviewSchedule(currentCard.box, rating, now)
     
     // Update the card
     await updateCard(currentCard.id, { box, due, updatedAt: now })
@@ -145,7 +165,7 @@ function ReviewPage() {
     if (newQueue.length === 0) {
       setSessionActive(false)
     }
-  }, [currentCard, showAnswer, queue, nextBoxAndDue, updateCard])
+  }, [currentCard, showAnswer, queue, calculateNextReviewSchedule, updateCard])
 
   // Keyboard event handler
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -237,22 +257,22 @@ function ReviewPage() {
         </Link>
       </div>
 
-      {/* HUD Stats */}
+      {/* Session Statistics */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{hudStats.dueToday}</div>
+          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{sessionStatistics.dueToday}</div>
           <div className="text-sm text-gray-600 dark:text-gray-400">Due today</div>
         </div>
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-green-600 dark:text-green-400">{hudStats.newAvailable}</div>
+          <div className="text-2xl font-bold text-green-600 dark:text-green-400">{sessionStatistics.newAvailable}</div>
           <div className="text-sm text-gray-600 dark:text-gray-400">New available</div>
         </div>
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{hudStats.queueSize}</div>
+          <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{sessionStatistics.queueSize}</div>
           <div className="text-sm text-gray-600 dark:text-gray-400">In queue</div>
         </div>
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{hudStats.reviewed}</div>
+          <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{sessionStatistics.reviewed}</div>
           <div className="text-sm text-gray-600 dark:text-gray-400">Reviewed</div>
         </div>
       </div>

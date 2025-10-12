@@ -16,7 +16,7 @@ export type WikiLinkResolution = WikiLinkMatch | WikiLinkNoMatch
 /**
  * Normalize text for wiki-link matching: lowercase, strip special chars, collapse whitespace
  */
-function normalizeForMatching(text: string): string {
+function normalizeTextForWikiLinkMatching(text: string): string {
   return text
     .toLowerCase()
     .replace(/[_-]/g, ' ')
@@ -26,14 +26,13 @@ function normalizeForMatching(text: string): string {
 
 /**
  * Resolve a wiki-link target to an existing card
- * Matching strategy:
+ * Uses a 3-tier matching strategy for flexibility:
  * 1. Exact match on question (case-insensitive)
- * 2. Exact match on normalized question
- * 3. Fuzzy match using includes (normalized)
- * Returns the best match or not found
+ * 2. Exact match on normalized question (handles different separators)
+ * 3. Fuzzy match using includes (partial matches in either direction)
  */
 export function resolveWikiLink(target: string, cards: Card[]): WikiLinkResolution {
-  const normalizedTarget = normalizeForMatching(target)
+  const normalizedTarget = normalizeTextForWikiLinkMatching(target)
   
   // Try exact match first (case-insensitive)
   const exactMatch = cards.find(c => 
@@ -50,7 +49,7 @@ export function resolveWikiLink(target: string, cards: Card[]): WikiLinkResoluti
   
   // Try normalized exact match
   const normalizedMatch = cards.find(c => 
-    normalizeForMatching(c.question) === normalizedTarget
+    normalizeTextForWikiLinkMatching(c.question) === normalizedTarget
   )
   if (normalizedMatch) {
     return {
@@ -63,8 +62,8 @@ export function resolveWikiLink(target: string, cards: Card[]): WikiLinkResoluti
   
   // Try fuzzy match (includes)
   const fuzzyMatch = cards.find(c => 
-    normalizeForMatching(c.question).includes(normalizedTarget) ||
-    normalizedTarget.includes(normalizeForMatching(c.question))
+    normalizeTextForWikiLinkMatching(c.question).includes(normalizedTarget) ||
+    normalizedTarget.includes(normalizeTextForWikiLinkMatching(c.question))
   )
   if (fuzzyMatch) {
     return {

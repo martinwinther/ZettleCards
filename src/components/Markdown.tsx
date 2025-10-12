@@ -38,12 +38,11 @@ function Markdown({ markdown, className = '' }: MarkdownProps) {
     }))
   }, [markdown, cards])
 
-  const htmlContent = useMemo(() => {
-    let processed = markdown
-    
-    // Replace wiki-links with placeholders before markdown parsing
+  const replaceWikiLinksWithPlaceholders = (text: string, linkDataArray: typeof wikiLinkData): { processedText: string; placeholders: Map<string, { target: string; displayText: string; index: number }> } => {
+    let processedText = text
     const placeholders: Map<string, { target: string; displayText: string; index: number }> = new Map()
-    wikiLinkData.forEach((linkData, index) => {
+    
+    linkDataArray.forEach((linkData, index) => {
       const placeholder = `__WIKILINK_${index}__`
       const displayText = linkData.alias || linkData.target
       placeholders.set(placeholder, { 
@@ -51,8 +50,25 @@ function Markdown({ markdown, className = '' }: MarkdownProps) {
         displayText, 
         index 
       })
-      processed = processed.replace(linkData.match, placeholder)
+      processedText = processedText.replace(linkData.match, placeholder)
     })
+    
+    return { processedText, placeholders }
+  }
+
+  const restoreWikiLinksFromPlaceholders = (html: string, placeholders: Map<string, { target: string; displayText: string; index: number }>): string => {
+    let restoredHtml = html
+    
+    placeholders.forEach((data, placeholder) => {
+      const wikiLinkHtml = `<a href="#" class="wiki-link" data-target="${data.target}" data-index="${data.index}" tabindex="0">${data.displayText}</a>`
+      restoredHtml = restoredHtml.replace(placeholder, wikiLinkHtml)
+    })
+    
+    return restoredHtml
+  }
+
+  const markdownConvertedToHtml = useMemo(() => {
+    const { processedText, placeholders } = replaceWikiLinksWithPlaceholders(markdown, wikiLinkData)
     
     // Configure marked parser with GFM support
     const renderer = new marked.Renderer()
@@ -76,28 +92,25 @@ function Markdown({ markdown, className = '' }: MarkdownProps) {
     })
 
     // Convert markdown to HTML
-    let dirty = marked.parse(processed) as string
+    let unsafeHtml = marked.parse(processedText) as string
     
-    // Replace placeholders with wiki-link HTML
-    placeholders.forEach((data, placeholder) => {
-      const wikiLinkHtml = `<a href="#" class="wiki-link" data-target="${data.target}" data-index="${data.index}" tabindex="0">${data.displayText}</a>`
-      dirty = dirty.replace(placeholder, wikiLinkHtml)
-    })
+    // Restore wiki-links from placeholders
+    unsafeHtml = restoreWikiLinksFromPlaceholders(unsafeHtml, placeholders)
     
-    // Sanitize HTML to prevent XSS
-    const clean = DOMPurify.sanitize(dirty, {
+    // Sanitize HTML to prevent XSS attacks
+    const sanitizedHtml = DOMPurify.sanitize(unsafeHtml, {
       USE_PROFILES: { html: true },
       ADD_ATTR: ['target', 'rel', 'data-target', 'data-index', 'tabindex'],
       ALLOW_UNKNOWN_PROTOCOLS: false
     })
     
-    return clean
+    return sanitizedHtml
   }, [markdown, wikiLinkData])
 
   // Post-process to handle external links
-  const processedContent = useMemo(() => {
+  const htmlWithSecureExternalLinks = useMemo(() => {
     const tempDiv = document.createElement('div')
-    tempDiv.innerHTML = htmlContent
+    tempDiv.innerHTML = markdownConvertedToHtml
     
     // Add target="_blank" and security attributes to external links
     const links = tempDiv.querySelectorAll('a[href]')
@@ -110,7 +123,7 @@ function Markdown({ markdown, className = '' }: MarkdownProps) {
     })
     
     return tempDiv.innerHTML
-  }, [htmlContent])
+  }, [markdownConvertedToHtml])
 
   // Attach event handlers to wiki-links
   useEffect(() => {
@@ -219,7 +232,7 @@ function Markdown({ markdown, className = '' }: MarkdownProps) {
       <div
         ref={containerRef}
         className={`markdown-content text-base leading-relaxed text-gray-900 dark:text-gray-100 ${className}`}
-        dangerouslySetInnerHTML={{ __html: processedContent }}
+        dangerouslySetInnerHTML={{ __html: htmlWithSecureExternalLinks }}
       />
       
       {tooltip && (

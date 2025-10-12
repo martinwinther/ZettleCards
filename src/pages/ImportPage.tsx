@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { parseMdFile } from '../lib/extractFromMd'
+import { parseMarkdownFileToFlashcard } from '../lib/extractFromMd'
 import { useCardsContext } from '../lib/useCardsContext'
 import { sha256 } from '../lib/hash'
 import { normalizeTag } from '../lib/tags'
@@ -8,6 +8,8 @@ import { useToast } from '../components/useToast'
 import { Spinner } from '../components/Spinner'
 import { db } from '../db'
 import type { Card } from '../lib/types'
+
+const MAX_FILE_SIZE_BYTES = 10 * 1024
 
 type DuplicateAction = 'skip' | 'overwrite' | 'duplicate'
 
@@ -44,11 +46,31 @@ function ImportPage() {
     document.title = 'Import - ZettleCards'
   }, [])
 
-  const processFiles = async (files: FileList) => {
-    const MAX_FILE_SIZE = 10 * 1024 // 10KB in bytes
-    const mdFiles = Array.from(files).filter(file => file.name.endsWith('.md'))
+  /**
+   * Check if a card with this content hash already exists
+   * Uses content hash to detect duplicate imports even if filename changed
+   */
+  const checkForDuplicateCard = async (contentHash: string): Promise<DuplicateInfo | null> => {
+    const existingImport = await db.imports.where('contentHash').equals(contentHash).first()
     
-    if (mdFiles.length === 0) {
+    if (existingImport) {
+      const existingCard = await db.cards.get(existingImport.cardId)
+      if (existingCard) {
+        return {
+          existingCardId: existingCard.id,
+          existingQuestion: existingCard.question,
+          existingUpdatedAt: existingCard.updatedAt
+        }
+      }
+    }
+    
+    return null
+  }
+
+  const parseAndPreviewMarkdownFiles = async (files: FileList) => {
+    const markdownFiles = Array.from(files).filter(file => file.name.endsWith('.md'))
+    
+    if (markdownFiles.length === 0) {
       setError('Please select only .md (Markdown) files.')
       return
     }
@@ -57,8 +79,8 @@ function ImportPage() {
     const validFiles: File[] = []
     const oversizedFiles: string[] = []
     
-    for (const file of mdFiles) {
-      if (file.size > MAX_FILE_SIZE) {
+    for (const file of markdownFiles) {
+      if (file.size > MAX_FILE_SIZE_BYTES) {
         oversizedFiles.push(file.name)
       } else {
         validFiles.push(file)
@@ -73,7 +95,7 @@ function ImportPage() {
     
     if (oversizedFiles.length > 0) {
       setError(`${oversizedFiles.length} file(s) skipped (over 10KB): ${oversizedFiles.join(', ')}`)
-    } else if (mdFiles.length !== files.length) {
+    } else if (markdownFiles.length !== files.length) {
       setError('Some files were skipped - only .md files are supported.')
     } else {
       setError('')
@@ -84,23 +106,10 @@ function ImportPage() {
     for (const file of validFiles) {
       try {
         const text = await file.text()
-        const parsed = parseMdFile(text, file.name)
+        const parsed = parseMarkdownFileToFlashcard(text, file.name)
         
         const contentHash = await sha256(parsed.question + '\n\n' + parsed.answerMD)
-        
-        const existingImport = await db.imports.where('contentHash').equals(contentHash).first()
-        let duplicateInfo: DuplicateInfo | null = null
-        
-        if (existingImport) {
-          const existingCard = await db.cards.get(existingImport.cardId)
-          if (existingCard) {
-            duplicateInfo = {
-              existingCardId: existingCard.id,
-              existingQuestion: existingCard.question,
-              existingUpdatedAt: existingCard.updatedAt
-            }
-          }
-        }
+        const duplicateInfo = await checkForDuplicateCard(contentHash)
         
         newPreviews.push({
           id: crypto.randomUUID(),
@@ -137,13 +146,13 @@ function ImportPage() {
     setDragActive(false)
     
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      processFiles(e.dataTransfer.files)
+      parseAndPreviewMarkdownFiles(e.dataTransfer.files)
     }
   }
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      processFiles(e.target.files)
+      parseAndPreviewMarkdownFiles(e.target.files)
     }
   }
 
@@ -185,9 +194,9 @@ function ImportPage() {
 
   const importCards = async () => {
     const now = Date.now()
-    const toImport = previews.filter(p => p.action !== 'skip')
+    const cardsToImport = previews.filter(p => p.action !== 'skip')
     
-    if (toImport.length === 0) {
+    if (cardsToImport.length === 0) {
       toast({
         type: 'info',
         title: 'No cards to import',
@@ -199,7 +208,7 @@ function ImportPage() {
     setIsImporting(true)
 
     try {
-      for (const preview of toImport) {
+      for (const preview of cardsToImport) {
         let cardId: string
         
         if (preview.action === 'overwrite' && preview.duplicateInfo) {
@@ -238,7 +247,7 @@ function ImportPage() {
       toast({
         type: 'success',
         title: 'Import successful',
-        message: `Imported ${toImport.length} card(s)`
+        message: `Imported ${cardsToImport.length} card(s)`
       })
       navigate('/library')
     } catch (error) {

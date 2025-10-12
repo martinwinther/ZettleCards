@@ -5,7 +5,8 @@ interface ParsedMatter {
 
 /**
  * Simple browser-compatible front matter parser
- * Handles basic YAML front matter extraction
+ * Note: This is a lightweight YAML parser for basic frontmatter only.
+ * It does not support the full YAML spec (no nested objects, no multiline values, etc.)
  */
 export function parseFrontMatter(raw: string): ParsedMatter {
   const frontMatterRegex = /^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/
@@ -19,12 +20,56 @@ export function parseFrontMatter(raw: string): ParsedMatter {
   }
   
   const [, frontMatterStr, content] = match
-  const data = parseFrontMatterData(frontMatterStr)
+  const data = parseSimpleYamlToObject(frontMatterStr)
   
   return { data, content }
 }
 
-function parseFrontMatterData(yamlStr: string): Record<string, unknown> {
+function removeQuotesIfPresent(value: string): string {
+  if ((value.startsWith('"') && value.endsWith('"')) || 
+      (value.startsWith("'") && value.endsWith("'"))) {
+    return value.slice(1, -1)
+  }
+  return value
+}
+
+function parseYamlArrayValue(value: string, lines: string[], currentLine: string): string[] | null {
+  // Handle inline array format: [item1, item2]
+  if (value.startsWith('[') && value.endsWith(']')) {
+    const arrayContent = value.slice(1, -1)
+    return arrayContent
+      .split(',')
+      .map(item => removeQuotesIfPresent(item.trim()))
+      .filter(Boolean)
+  }
+  
+  // Handle multiline array format (items starting with -)
+  if (value === '' || value === '[]') {
+    const arrayItems: string[] = []
+    let currentLineIndex = lines.indexOf(currentLine) + 1
+    
+    while (currentLineIndex < lines.length) {
+      const nextLine = lines[currentLineIndex].trim()
+      if (nextLine.startsWith('-')) {
+        const item = nextLine.slice(1).trim()
+        arrayItems.push(removeQuotesIfPresent(item))
+        currentLineIndex++
+      } else if (nextLine === '') {
+        currentLineIndex++
+      } else {
+        break
+      }
+    }
+    
+    if (arrayItems.length > 0) {
+      return arrayItems
+    }
+  }
+  
+  return null
+}
+
+function parseSimpleYamlToObject(yamlStr: string): Record<string, unknown> {
   const data: Record<string, unknown> = {}
   const lines = yamlStr.split('\n')
   
@@ -39,47 +84,11 @@ function parseFrontMatterData(yamlStr: string): Record<string, unknown> {
     const key = trimmed.slice(0, colonIndex).trim()
     let value = trimmed.slice(colonIndex + 1).trim()
     
-    // Remove quotes if present
-    if ((value.startsWith('"') && value.endsWith('"')) || 
-        (value.startsWith("'") && value.endsWith("'"))) {
-      value = value.slice(1, -1)
-    }
+    value = removeQuotesIfPresent(value)
     
-    // Handle arrays (simple format: [item1, item2] or on separate lines)
-    if (value.startsWith('[') && value.endsWith(']')) {
-      const arrayContent = value.slice(1, -1)
-      data[key] = arrayContent
-        .split(',')
-        .map(item => item.trim().replace(/^["']|["']$/g, ''))
-        .filter(Boolean)
-    } else if (value === '' || value === '[]') {
-      // Check if next lines are array items (starting with -)
-      const arrayItems: string[] = []
-      let currentLineIndex = lines.indexOf(line) + 1
-      
-      while (currentLineIndex < lines.length) {
-        const nextLine = lines[currentLineIndex].trim()
-        if (nextLine.startsWith('-')) {
-          let item = nextLine.slice(1).trim()
-          // Remove quotes if present
-          if ((item.startsWith('"') && item.endsWith('"')) || 
-              (item.startsWith("'") && item.endsWith("'"))) {
-            item = item.slice(1, -1)
-          }
-          arrayItems.push(item)
-          currentLineIndex++
-        } else if (nextLine === '') {
-          currentLineIndex++
-        } else {
-          break
-        }
-      }
-      
-      if (arrayItems.length > 0) {
-        data[key] = arrayItems
-      } else {
-        data[key] = value
-      }
+    const arrayValue = parseYamlArrayValue(value, lines, line)
+    if (arrayValue !== null) {
+      data[key] = arrayValue
     } else {
       data[key] = value
     }
